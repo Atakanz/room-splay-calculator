@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 // Logoyu import ediyoruz (Yolunu projenizdeki asset klasörüne göre kontrol edebilirsiniz)
-import logo from '../assets/project_logo.png';
+import logo from '../assets/project_logo_2.png';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -96,14 +96,14 @@ export default function Navbar() {
                     <div className={`flex items-center transition-all duration-300 ${isOpen ? 'opacity-0 md:opacity-100 pointer-events-none' : 'opacity-100'}`}>
                         <a href="/" className="flex items-center">
                             {/* 🛠️ DÜZELTME: translate-y kaldırıldı, h-12 ve md:h-16 ile dikey ezilmeden orantılı büyümesi sağlandı */}
-                            <img src={logo} alt="Project Logo" className="h-14 md:h-20 w-auto object-contain" />
+                            <img src={logo} alt="Project Logo" className="h-18 md:h-20 w-auto object-contain" />
                         </a>
                     </div>
 
                     {/* ORTADAKİ LOGO (Menü Açıkken Mobilde Ortalanan) */}
                     <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:hidden transition-all duration-300 ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
                         <a href="/" className="flex items-center">
-                            <img src={logo} alt="Project Logo" className="h-14 w-auto object-contain" />
+                            <img src={logo} alt="Project Logo" className="h-18 w-auto object-contain" />
                         </a>
                     </div>
 
