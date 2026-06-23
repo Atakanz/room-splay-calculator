@@ -17,7 +17,7 @@ export default function AboutProject() {
                 <header className="border-b-4 border-sky-600 bg-slate-50 p-8 md:p-12">
                     <div className="flex items-center gap-2 text-sky-700 font-mono text-xs uppercase tracking-widest mb-4 font-bold">
                         <FileText size={16} />
-                        <span>Research Documentation &bull; ICSV32 Istanbul</span>
+                        <span>ICSV32 Istanbul - International Congress on Sound and Vibration</span>
                     </div>
                     <p className="text-xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
                         A Geometric Framework for Controlled Wall Splaying In ITU-Compliant Listening Room Design
@@ -90,52 +90,53 @@ export default function AboutProject() {
                     <section>
                         <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 border-b border-slate-200 pb-2 mb-6">
                             <Activity className="text-sky-600" size={24} />
-                            3. Computational Acoustic Engine
+                            3. Functions
                         </h2>
                         <p className="text-slate-700 mb-6 text-sm text-justify">
                             The project utilizes a custom React-based acoustic calculator. This engine continuously monitors physical inputs and processes modal responses in real-time, enforcing ITU-R limitations on asymmetric shapes.
                         </p>
 
-                        <div className="grid md:grid-cols-3 gap-4">
+                        <div className="grid md:grid-cols-2 gap-6 mt-6">
                             {/* Feature 1 */}
-                            <div className="bg-slate-900 text-slate-300 p-5 shadow-inner border-t-4 border-sky-500">
-                                <h3 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
-                                    <Activity size={16} className="text-sky-400" />
+                            <div className="bg-slate-50 border border-slate-200 rounded-b-lg p-6 shadow-sm border-t-4 border-t-sky-500 flex flex-col">
+                                <h3 className="text-slate-900 font-bold text-sm mb-3 flex items-center gap-2">
+                                    <Activity size={18} className="text-sky-500 shrink-0" />
                                     Modal Density
                                 </h3>
-                                <p className="text-xs leading-relaxed opacity-90 text-justify">
+                                <p className="text-sm text-slate-600 leading-relaxed text-justify">
                                     Scans all possible room ratios generated across each splaying angle. This enables a detailed observation of modal frequency distributions, allowing for the precise determination of the most optimal splay angle.
                                 </p>
                             </div>
 
                             {/* Feature 2 */}
-                            <div className="bg-slate-900 text-slate-300 p-5 shadow-inner border-t-4 border-amber-500">
-                                <h3 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
-                                    <AlertCircle size={16} className="text-amber-400" />
+                            <div className="bg-slate-50 border border-slate-200 rounded-b-lg p-6 shadow-sm border-t-4 border-t-amber-500 flex flex-col">
+                                <h3 className="text-slate-900 font-bold text-sm mb-3 flex items-center gap-2">
+                                    <AlertCircle size={18} className="text-amber-500 shrink-0" />
                                     Axial Cluster Detection
                                 </h3>
-                                <p className="text-xs leading-relaxed opacity-90 text-justify">
-                                    The optimizer looks for the minimum number of clusters and, among those candidates, selects the setup where the first cluster formation occurs at the highest possible frequency region as the ideal splay angle."
+                                <p className="text-sm text-slate-600 leading-relaxed text-justify">
+                                    The optimizer looks for the minimum number of clusters and, among those candidates, selects the setup where the first cluster formation occurs at the highest possible frequency region as the ideal splay angle.
                                 </p>
                             </div>
 
                             {/* Feature 3 */}
-                            <div className="bg-slate-900 text-slate-300 p-5 shadow-inner border-t-4 border-purple-500">
-                                <h3 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
-                                    <Maximize size={16} className="text-purple-400" />
+                            <div className="bg-slate-50 border border-slate-200 rounded-b-lg p-6 shadow-sm border-t-4 border-t-purple-500 flex flex-col">
+                                <h3 className="text-slate-900 font-bold text-sm mb-3 flex items-center gap-2">
+                                    <Maximize size={18} className="text-purple-500 shrink-0" />
                                     Physical Constraints
                                 </h3>
-                                <p className="text-xs leading-relaxed opacity-90">
+                                <p className="text-sm text-slate-600 leading-relaxed">
                                     Strictly enforces physical compliance limits. The engine restricts area outputs outside the <strong>20 – 60 m²</strong> range and triggers immediate visual warnings if the front speaker wall (Wfront) drops below the safe <strong>4.0m</strong> threshold.
                                 </p>
                             </div>
 
-                            <div className="bg-slate-900 text-slate-300 p-5 shadow-inner border-t-4 border-emerald-600">
-                                <h3 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
-                                    <LocateFixed size={16} className="text-emerald-400" />
+                            {/* Feature 4 */}
+                            <div className="bg-slate-50 border border-slate-200 rounded-b-lg p-6 shadow-sm border-t-4 border-t-emerald-500 flex flex-col">
+                                <h3 className="text-slate-900 font-bold text-sm mb-3 flex items-center gap-2">
+                                    <LocateFixed size={18} className="text-emerald-500 shrink-0" />
                                     Recoverable Zone
                                 </h3>
-                                <p className="text-xs leading-relaxed opacity-90 text-justify">
+                                <p className="text-sm text-slate-600 leading-relaxed text-justify">
                                     By applying precise angular splaying, the framework shifts some geometries, pulling them back into the ITU-standardized performance region and expanding the functional boundaries of traditional acoustic ratio charts.
                                 </p>
                             </div>
