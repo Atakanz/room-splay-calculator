@@ -1,27 +1,39 @@
-/**
- * ITU-R BS.1116-3 Standart Oda Oranı Sınır Kontrolü [cite: 14, 67]
- */
 export function checkRatio(w_ratio, l_ratio) {
-    const is_in_range = (1.1 * w_ratio <= l_ratio) && (l_ratio <= 4.5 * w_ratio - 4); // [cite: 67]
-    const is_less_than_3 = (l_ratio < 3 && w_ratio < 3);
-    return is_in_range && is_less_than_3;
+
+    const EPS = 0.0001;
+
+    const isGreenRegion =
+
+        w_ratio >= 1.18 - EPS &&
+
+        w_ratio <= 2.71 + EPS &&
+
+        l_ratio >= (1.1 * w_ratio) - EPS &&
+
+        l_ratio <= (4.5 * w_ratio - 4) + EPS;
+
+    const isLessThan3 =
+
+        w_ratio < 3 - EPS &&
+
+        l_ratio < 3 - EPS;
+
+    return isGreenRegion && isLessThan3;
+
 }
 
 /**
- * Inwardly Splaying: Mevcut odaların duvarlarını içeri doğru açılandırma [cite: 110, 111, 122]
+ * Inwardly Splaying: Existing Room Modu Hesaplaması
  */
 export function splayTheRoom(w, l, h, angle_deg) {
     const angle_rad = (angle_deg * Math.PI) / 180;
 
-    // Yeni boyut hesaplamaları [cite: 132]
     const new_length = l / Math.cos(angle_rad);
     const new_width_short = w - (2 * l * Math.tan(angle_rad));
     const new_width_long = w;
 
-    // 4m hoparlör yerleşim sınır kontrolü [cite: 102, 134, 154]
     const is_under_4m = new_width_short < 4;
 
-    // Ortalama genişlik üzerinden eşdeğer oran hesaplama [cite: 17, 42]
     const avg_w = (new_width_short + new_width_long) / 2;
     const w_ratio = avg_w / h;
     const l_ratio = new_length / h;
@@ -35,48 +47,52 @@ export function splayTheRoom(w, l, h, angle_deg) {
     }
 }
 
-/**
- * Optimum Açı Tarayıcı Algoritması [cite: 109, 131]
- */
 export function calculateTheOptimumRatio(w, l, h) {
     const results = [];
-    let limit_reached_warning_printed = false;
-
     for (let angle = 0; angle < 15; angle++) {
         const { status, is_under_4m, message } = splayTheRoom(w, l, h, angle);
-
-        // 4m uyarısı sınır eşiğinde bir kez tetiklenir [cite: 134, 154]
-        if (is_under_4m && !limit_reached_warning_printed) {
-            console.log(`\n[!] Dikkat: ${angle} derece itibariyle kısa kenar 4 metreden az oluyor (Yerleşim standart dışı).`);
-            limit_reached_warning_printed = true;
-        }
-
         if (status) {
-            results.push({ angle, message, warning: is_under_4m ? true : false });
+            results.push({ angle, message, warning: is_under_4m });
         }
     }
-
     return results;
 }
 
 /**
- * Controlled Splaying: Aynı hedef oran ve mod yapısını koruyarak tersten boyut hesaplama [cite: 112, 186, 188]
+ * Controlled Splaying (Design Phase Formülleri)
  */
-export function splayTheRoomWithTheSameRatio(w, l, h, angle_deg) {
-    const w_ratio_i = w / h;
-    const l_ratio_i = l / h;
-
+export function calculateDesignPhaseMetrics(wRatio, lRatio, angle_deg) {
     const angle_rad = (angle_deg * Math.PI) / 180;
 
-    // Formül dönüşümleri [cite: 195, 196, 197]
-    const w_ratio = w_ratio_i + l_ratio_i * Math.tan(angle_rad);
-    const l_ratio = l_ratio_i * Math.cos(angle_rad);
+    const sPrimeW = wRatio + (lRatio * Math.tan(angle_rad));
+    const sPrimeL = lRatio * Math.cos(angle_rad);
 
-    const h_min = 4 / (w_ratio - 2 * l_ratio * Math.tan(angle_rad));
-    const length = l_ratio * h_min;
-    const width_front = (w_ratio - 2 * l_ratio * Math.tan(angle_rad)) * h_min;
-    const width_rear = w_ratio * h_min;
+    const denominator = sPrimeW - (2 * sPrimeL * Math.tan(angle_rad));
+    const hMinFormula = denominator > 0 ? (4 / denominator) : 2.5;
+    const hMin = parseFloat(Math.max(2.5, hMinFormula).toFixed(2));
 
-    const result = { angle_deg, width: { front: width_front.toFixed(2), rear: width_rear.toFixed(2) }, length: length.toFixed(2), height: h_min.toFixed(2) }
-    return result
+    return { sPrimeW, sPrimeL, hMin };
+}
+
+/**
+ * Belirli bir tavan yüksekliği (h) kullanarak fiziksel stüdyo boyutlarını türetir
+ */
+export function splayTheRoomWithTheSameRatio(wRatio, lRatio, h, angle_deg) {
+    const metrics = calculateDesignPhaseMetrics(wRatio, lRatio, angle_deg);
+    const angle_rad = (angle_deg * Math.PI) / 180;
+
+    const length = metrics.sPrimeL * h;
+    const width_front = (metrics.sPrimeW - (2 * metrics.sPrimeL * Math.tan(angle_rad))) * h;
+    const width_rear = metrics.sPrimeW * h;
+
+    return {
+        angle_deg,
+        width: {
+            front: width_front.toFixed(2),
+            rear: width_rear.toFixed(2)
+        },
+        length: length.toFixed(2),
+        w_ratio: metrics.sPrimeW,
+        l_ratio: metrics.sPrimeL
+    };
 }

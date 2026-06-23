@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+// Logoyu import ediyoruz (Yolunu projenizdeki asset klasörüne göre kontrol edebilirsiniz)
+import logo from '../assets/project_logo.png';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -37,7 +39,7 @@ export default function Navbar() {
             const timeElapsed = currentTime - startTime;
             const progress = Math.min(timeElapsed / duration, 1);
 
-            // 🎨 Easing Fonksiyonu (easeInOutCubic: Başta ve sonda yavaş, ortada akıcı)
+            // 🎨 Easing Fonksiyonu (easeInOutCubic)
             const ease = progress < 0.5
                 ? 4 * progress * progress * progress
                 : 1 - Math.pow(-2 * progress + 2, 3) / 2;
@@ -56,11 +58,7 @@ export default function Navbar() {
     const handleBurgerClick = () => {
         if (window.scrollY > 50) {
             setIsScrollingUp(true);
-
-            // ⏱️ BURADAN HIZI AYARLAYABİLİRSİN: 
-            // 400 = Hızlı, 800 = Dengeli (Default), 1500 = Çok Yavaş/Sanatsal
             smoothScrollToTop(200);
-
             setIsOpen(true);
         } else {
             setIsOpen(!isOpen);
@@ -92,13 +90,21 @@ export default function Navbar() {
                     }
                 `}</style>
 
-                <div className="flex items-center justify-between max-w-7xl mx-auto relative h-10">
+                <div className="flex items-center justify-between max-w-7xl mx-auto relative">
+
+                    {/* SOL TARAFTAKİ LOGO (Masaüstü ve Menü Kapalıyken Mobil) */}
                     <div className={`flex items-center transition-all duration-300 ${isOpen ? 'opacity-0 md:opacity-100 pointer-events-none' : 'opacity-100'}`}>
-                        <a href="/" style={{ fontFamily: "'base-font', sans-serif" }} className="text-3xl md:text-4xl text-black tracking-tight leading-none transform translate-y-[3px] md:translate-y-[3px]">DEU</a>
+                        <a href="/" className="flex items-center">
+                            {/* 🛠️ DÜZELTME: translate-y kaldırıldı, h-12 ve md:h-16 ile dikey ezilmeden orantılı büyümesi sağlandı */}
+                            <img src={logo} alt="Project Logo" className="h-18 md:h-24 w-auto object-contain" />
+                        </a>
                     </div>
 
+                    {/* ORTADAKİ LOGO (Menü Açıkken Mobilde Ortalanan) */}
                     <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:hidden transition-all duration-300 ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
-                        <a href="/" style={{ fontFamily: "'base-font', sans-serif" }} className="text-3xl md:text-4xl text-black tracking-tight leading-none transform translate-y-[3px] md:translate-y-[3px]">DEU</a>
+                        <a href="/" className="flex items-center">
+                            <img src={logo} alt="Project Logo" className="h-16 w-auto object-contain" />
+                        </a>
                     </div>
 
                     <button type="button" onClick={handleBurgerClick} className={`md:hidden flex flex-col justify-center items-center w-10 h-10 z-50 relative outline-none ml-auto cursor-pointer rounded-full transition-transform duration-500 bg-neutral-50/20 ${isOpen ? 'rotate-180' : 'rotate-0'}`} aria-label="Menüyü Aç/Kapat">
@@ -110,7 +116,6 @@ export default function Navbar() {
                     </button>
 
                     <div className="hidden md:flex items-center ml-auto gap-10">
-
                         <a href="/" style={{ fontFamily: "base-font" }} onClick={() => setIsOpen(false)} className={navLinkClass}>PROJECT</a>
                         <a href="/calculator" style={{ fontFamily: "base-font" }} onClick={() => setIsOpen(false)} className={navLinkClass}>CALCULATOR</a>
                     </div>

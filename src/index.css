@@ -61,7 +61,6 @@ h1,
 h2 {
   font-family: var(--heading);
   font-weight: 500;
-  color: var(--text-h);
 }
 
 h1 {
@@ -111,4 +110,15 @@ code {
   font-weight: normal;
   font-style: normal;
   font-display: block;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: inner-spin-button !important;
+  opacity: 1 !important;
+}
+
+/* Firefox için okları zorla göster */
+input[type="number"] {
+  -moz-appearance: textfield !important;
 }
