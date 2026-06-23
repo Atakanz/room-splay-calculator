@@ -25,14 +25,14 @@ export default function AboutProject() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-200">
                         <div>
-                            <p className="text-xs text-slate-500 uppercase tracking-widest font-mono mb-1">Researcher</p>
+                            <p className="text-xs text-slate-500 uppercase tracking-widest font-mono mb-1">Researchers</p>
                             <p className="font-semibold text-slate-800">Atakan Zerafet</p>
                             <p className="text-sm text-slate-600">Art & Design, Dokuz Eylul University</p>
+                            <p className="font-semibold mt-1 text-slate-800">Suat Vergili, Feridun Öziş</p>
+                            <p className="text-sm text-slate-600">Music Technology, Dokuz Eylul University</p>
                         </div>
                         <div>
-                            <p className="text-xs text-slate-500 uppercase tracking-widest font-mono mb-1">Supervisors</p>
-                            <p className="font-semibold text-slate-800">Suat Vergili, Feridun Öziş</p>
-                            <p className="text-sm text-slate-600">Music Technology, Dokuz Eylul University</p>
+
                         </div>
                     </div>
                 </header>
