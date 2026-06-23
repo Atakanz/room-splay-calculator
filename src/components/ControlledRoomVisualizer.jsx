@@ -110,7 +110,7 @@ export default function ControlledRoomVisualizer({ result }) {
 
                     {/* TAM ORTALANMIŞ GENİŞLİK VE UZUNLUK ETİKETLERİ */}
                     {/* w_rear (Yatayda Tam Ortalanmış) */}
-                    <text x={centerX} y={rLeftTop.y - 15} textAnchor="middle" className="fill-mist-400 font-bold tracking-wide text-[10px]">
+                    <text x={centerX} y={rLeftTop.y - 15} textAnchor="middle" className="fill-mist-400 font-bold tracking-wide text-[18px]">
                         Width Rear: {wRear.toFixed(2)} m
                     </text>
 
@@ -120,13 +120,13 @@ export default function ControlledRoomVisualizer({ result }) {
                         y={centerY}
                         textAnchor="middle"
                         transform={`rotate(-90 ${rLeftTop.x - 20} ${centerY})`}
-                        className="fill-mist-400 text-[10px] tracking-wide"
+                        className="fill-mist-400 text-[18px] tracking-wide"
                     >
                         Length: {length.toFixed(2)} m
                     </text>
 
                     {/* w_front (Yatayda Tam Ortalanmış) */}
-                    <text x={centerX} y={rLeftBot.y + 22} textAnchor="middle" className="fill-mist-400 font-bold text-[10px] tracking-wide">
+                    <text x={centerX} y={rLeftBot.y + 22} textAnchor="middle" className="fill-mist-400 font-bold text-[18px] tracking-wide">
                         Width Front: {wFront.toFixed(2)} m
                     </text>
 

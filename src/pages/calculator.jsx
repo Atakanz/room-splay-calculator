@@ -272,28 +272,32 @@ export default function Calculator() {
 
     return (
         <div className="p-4 md:p-8 max-w-7xl mx-auto font-sans text-slate-800 select-none">
-            <h1 className="text-2xl font-bold mb-6 border-b pb-3 tracking-tight">Acoustic Room Calculator</h1>
 
             {/* STRATEGY MODE SELECTION */}
             <div className="grid grid-cols-2 gap-3 mb-6 bg-slate-100 p-1.5 rounded-xl border border-slate-200/60">
                 <button
                     onClick={() => { setStrategyMode('optimum'); setResult(null); }}
-                    className={`flex items-center justify-center gap-2 py-3 rounded-lg text-xs sm:text-sm font-semibold tracking-wide transition-all ${strategyMode === 'optimum' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'}`}
+                    className={`flex items-center justify-center gap-2 py-3 px-2 rounded-lg text-xs sm:text-sm font-semibold tracking-wide transition-all ${strategyMode === 'optimum' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'}`}
                 >
-                    <MdLayers size={18} /> EXISTING ROOM (INWARD SPLAY)
+                    <MdLayers size={18} className="shrink-0" />
+                    <span className="text-center leading-tight">
+                        EXISTING ROOM <br className="hidden lg:block" /> (INWARD SPLAY)
+                    </span>
                 </button>
                 <button
                     onClick={() => { setStrategyMode('controlled'); setResult(null); }}
-                    className={`flex items-center justify-center gap-2 py-3 rounded-lg text-xs sm:text-sm font-semibold tracking-wide transition-all ${strategyMode === 'controlled' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'}`}
+                    className={`flex items-center justify-center gap-2 py-3 px-2 rounded-lg text-xs sm:text-sm font-semibold tracking-wide transition-all ${strategyMode === 'controlled' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'}`}
                 >
-                    <MdArchitecture size={18} /> DESIGN PHASE (CONTROLLED SPLAY)
+                    <MdArchitecture size={18} className="shrink-0" />
+                    <span className="text-center leading-tight">
+                        DESIGN PHASE <br className="hidden lg:block" /> (CONTROLLED SPLAY)
+                    </span>
                 </button>
             </div>
 
             {/* INPUT & CHART PANEL */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6 items-start">
                 <div className="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200 md:col-span-2">
-                    <h2 className="font-bold text-slate-500 uppercase text-[10px] tracking-widest border-b pb-1 mb-2">Geometric Parameters</h2>
 
                     {/* INPUT: Width Ratio */}
                     <div>
@@ -440,7 +444,7 @@ export default function Calculator() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-700 pb-2 mb-3 gap-3">
                     <div>
                         <h2 className="text-xs font-bold uppercase tracking-wider text-shadow-olive-100">
-                            {strategyMode === 'controlled' ? 'Outer Rectangular Shell Response' : 'Initial Room Acoustic Response'}
+                            {strategyMode === 'controlled' ? 'Outer Rectangular Response' : 'Initial Room Response'}
                         </h2>
                         <p className="text-xs text-slate-200 font-mono">Dimensions: {w.toFixed(2)} m x {l.toFixed(2)} m x {currentHeight} m</p>
                     </div>
@@ -460,7 +464,7 @@ export default function Calculator() {
                 </div>
 
                 <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-sm min-h-[120px]">
-                    <p className="text-[11px] uppercase text-slate-400 font-bold mb-2">Calculated Wave Vectors Limit (&lt;200Hz)</p>
+                    <p className="text-[11px] uppercase text-slate-400 font-bold mb-2">(&lt;200Hz)</p>
                     <div className="max-h-44 overflow-y-auto grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-xs pr-1">
                         {initialRoomData.modes.map((m, idx) => (
                             <div key={idx} className="flex flex-col p-1.5 rounded bg-slate-900/50 border border-slate-700/60 justify-between">
@@ -563,15 +567,12 @@ export default function Calculator() {
                                                     <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-400">
                                                         Target Angle Response ({selectedModalData.angle}° Splay)
                                                     </h3>
-                                                    <p className="text-xs text-slate-400 font-mono">Normalized Ratios: {selectedModalData.ratio}</p>
+                                                    <p className="text-xs text-slate-400 font-mono">{selectedModalData.ratio}</p>
                                                 </div>
-                                                <span className="text-[10px] bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 font-mono px-2 py-0.5 rounded">
-                                                    ACTIVE VIEW
-                                                </span>
                                             </div>
 
                                             <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-sm min-h-[120px]">
-                                                <p className="text-[11px] uppercase text-slate-400 font-bold mb-2">Calculated Wave Vectors Limit (&lt;200Hz)</p>
+                                                <p className="text-[11px] uppercase text-slate-400 font-bold mb-2">Calculated (&lt;200Hz)</p>
                                                 <div className="max-h-56 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-2 font-mono text-xs pr-1">
                                                     {selectedModalData.modes.map((m, idx) => (
                                                         <div key={idx} className="flex flex-col p-1.5 rounded bg-slate-900/50 border border-slate-700/60 justify-between">
@@ -606,21 +607,21 @@ export default function Calculator() {
                         <div className="space-y-4">
                             {/* Mevcut Numerik Sonuç Grid'i */}
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 font-mono text-sm animate-in zoom-in-95 duration-200">
-                                <div className="p-2.5 bg-indigo-50/50 border border-indigo-100 rounded">
-                                    <p className="text-[9px] text-indigo-500 uppercase font-sans">Angle</p>
-                                    <p className="font-semibold">{result.angle_deg}°</p>
+                                <div className="p-3 md:p-2.5 bg-indigo-50/50 border border-indigo-100 rounded">
+                                    <p className="text-xs md:text-[10px] text-indigo-500 uppercase font-sans tracking-wide">Angle</p>
+                                    <p className="text-base md:text-sm font-semibold">{result.angle_deg}°</p>
                                 </div>
-                                <div className="p-2.5 bg-slate-50 border border-slate-100 rounded">
-                                    <p className="text-[9px] text-slate-500 uppercase font-sans">Width Front</p>
-                                    <p className="font-semibold">{result.width.front} m</p>
+                                <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
+                                    <p className="text-xs md:text-[10px] text-slate-500 uppercase font-sans tracking-wide">Width Front</p>
+                                    <p className="text-base md:text-sm font-semibold">{result.width.front} m</p>
                                 </div>
-                                <div className="p-2.5 bg-slate-50 border border-slate-100 rounded">
-                                    <p className="text-[9px] text-slate-500 uppercase font-sans">Width Rear</p>
-                                    <p className="font-semibold">{result.width.rear} m</p>
+                                <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
+                                    <p className="text-xs md:text-[10px] text-slate-500 uppercase font-sans tracking-wide">Width Rear</p>
+                                    <p className="text-base md:text-sm font-semibold">{result.width.rear} m</p>
                                 </div>
-                                <div className="p-2.5 bg-slate-50 border border-slate-100 rounded">
-                                    <p className="text-[9px] text-slate-500 uppercase font-sans">Length</p>
-                                    <p className="font-semibold">{result.length} m</p>
+                                <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
+                                    <p className="text-xs md:text-[10px] text-slate-500 uppercase font-sans tracking-wide">Length</p>
+                                    <p className="text-base md:text-sm font-semibold">{result.length} m</p>
                                 </div>
                             </div>
 
@@ -643,13 +644,11 @@ export default function Calculator() {
                                                     Averaged Dimensions: {splayedW.toFixed(2)} m x {splayedL.toFixed(2)} m x {currentHeight} m
                                                 </p>
                                             </div>
-                                            <span className="text-[10px] bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 font-mono px-2 py-0.5 rounded">
-                                                ACTIVE VIEW
-                                            </span>
+
                                         </div>
 
                                         <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-sm min-h-[120px]">
-                                            <p className="text-[11px] uppercase text-slate-400 font-bold mb-2">Calculated Wave Vectors Limit (&lt;200Hz)</p>
+                                            <p className="text-[11px] uppercase text-slate-400 font-bold mb-2">(&lt;200Hz)</p>
                                             <div className="max-h-56 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-2 font-mono text-xs pr-1">
                                                 {splayedModes?.map((m, idx) => (
                                                     <div key={idx} className="flex flex-col p-1.5 rounded bg-slate-900/50 border border-slate-700/60 justify-between">

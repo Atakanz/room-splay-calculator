@@ -19,9 +19,9 @@ export default function AboutProject() {
                         <FileText size={16} />
                         <span>Research Documentation &bull; ICSV32 Istanbul</span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
+                    <p className="text-xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
                         A Geometric Framework for Controlled Wall Splaying In ITU-Compliant Listening Room Design
-                    </h1>
+                    </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-200">
                         <div>
@@ -49,7 +49,7 @@ export default function AboutProject() {
                             <p>
                                 International acoustic standards, specifically ITU-R BS.1116-3, provide strict dimensional room ratios for critical listening environments and suggest the use of trapezoidal geometries. However, while the standard offers these ratios, it provides no mathematical formulas or established methodologies to implement them in non-parallel architectural footprints.
                             </p>
-                            <p className="bg-sky-50 border-l-4 border-sky-500 p-4 text-slate-800 italic text-sm">
+                            <p className="bg-sky-50 border-l-4 border-sky-500 p-4 text-slate-800 italic text-sm text-justify">
                                 There is a distinct lack of quantitative design guidelines for trapezoidal models. This framework establishes a mathematical bridge, ensuring non-parallel wall geometries can be objectively evaluated against standardized rectangular criteria.
                             </p>
                         </div>
@@ -64,7 +64,7 @@ export default function AboutProject() {
                         <div className="grid md:grid-cols-2 gap-6">
                             <div className="border border-slate-200 p-6 bg-slate-50">
                                 <h3 className="font-mono font-bold text-sky-700 mb-3 text-sm uppercase tracking-wide">Inward Splaying</h3>
-                                <p className="text-sm text-slate-600 leading-relaxed mb-4">
+                                <p className="text-sm text-slate-600 leading-relaxed mb-4 text-justify">
                                     Usable for existing rooms. This methodology applies angled acoustic boundaries <em>inside</em> an established room to remediate periodic reflections.
                                 </p>
                                 <ul className="text-xs text-slate-500 space-y-2">
@@ -75,7 +75,7 @@ export default function AboutProject() {
 
                             <div className="border border-slate-200 p-6 bg-slate-50">
                                 <h3 className="font-mono font-bold text-sky-700 mb-3 text-sm uppercase tracking-wide">Controlled Splaying</h3>
-                                <p className="text-sm text-slate-600 leading-relaxed mb-4">
+                                <p className="text-sm text-slate-600 leading-relaxed mb-4 text-justify">
                                     Implemented during the architectural stage. Geometry is generated outward based on target splay angles rather than shrinking an existing room.
                                 </p>
                                 <ul className="text-xs text-slate-500 space-y-2">
@@ -92,7 +92,7 @@ export default function AboutProject() {
                             <Activity className="text-sky-600" size={24} />
                             3. Computational Acoustic Engine
                         </h2>
-                        <p className="text-slate-700 mb-6 text-sm">
+                        <p className="text-slate-700 mb-6 text-sm text-justify">
                             The project utilizes a custom React-based acoustic calculator. This engine continuously monitors physical inputs and processes modal responses in real-time, enforcing ITU-R limitations on asymmetric shapes.
                         </p>
 
@@ -103,7 +103,7 @@ export default function AboutProject() {
                                     <Activity size={16} className="text-sky-400" />
                                     Modal Density
                                 </h3>
-                                <p className="text-xs leading-relaxed opacity-90">
+                                <p className="text-xs leading-relaxed opacity-90 text-justify">
                                     Scans all possible room ratios generated across each splaying angle. This enables a detailed observation of modal frequency distributions, allowing for the precise determination of the most optimal splay angle.
                                 </p>
                             </div>
@@ -114,7 +114,7 @@ export default function AboutProject() {
                                     <AlertCircle size={16} className="text-amber-400" />
                                     Axial Cluster Detection
                                 </h3>
-                                <p className="text-xs leading-relaxed opacity-90">
+                                <p className="text-xs leading-relaxed opacity-90 text-justify">
                                     The optimizer looks for the minimum number of clusters and, among those candidates, selects the setup where the first cluster formation occurs at the highest possible frequency region as the ideal splay angle."
                                 </p>
                             </div>
@@ -135,7 +135,7 @@ export default function AboutProject() {
                                     <LocateFixed size={16} className="text-emerald-400" />
                                     Recoverable Zone
                                 </h3>
-                                <p className="text-xs leading-relaxed opacity-90">
+                                <p className="text-xs leading-relaxed opacity-90 text-justify">
                                     By applying precise angular splaying, the framework shifts some geometries, pulling them back into the ITU-standardized performance region and expanding the functional boundaries of traditional acoustic ratio charts.
                                 </p>
                             </div>
