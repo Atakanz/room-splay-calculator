@@ -120,9 +120,9 @@ export default function AboutProject() {
                             </div>
 
                             {/* Feature 3 */}
-                            <div className="bg-slate-900 text-slate-300 p-5 shadow-inner border-t-4 border-emerald-500">
+                            <div className="bg-slate-900 text-slate-300 p-5 shadow-inner border-t-4 border-purple-500">
                                 <h3 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
-                                    <Maximize size={16} className="text-emerald-400" />
+                                    <Maximize size={16} className="text-purple-400" />
                                     Physical Constraints
                                 </h3>
                                 <p className="text-xs leading-relaxed opacity-90">
@@ -130,7 +130,7 @@ export default function AboutProject() {
                                 </p>
                             </div>
 
-                            <div className="bg-slate-900 text-slate-300 p-5 shadow-inner border-t-4 border-emerald-500">
+                            <div className="bg-slate-900 text-slate-300 p-5 shadow-inner border-t-4 border-emerald-600">
                                 <h3 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
                                     <LocateFixed size={16} className="text-emerald-400" />
                                     Recoverable Zone
