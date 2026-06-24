@@ -85,7 +85,15 @@ export default function Calculator() {
     // Modal analiz ve ITU uyumluluk takibi (Alan 20-60 sınırları dahil)
     useEffect(() => {
         const modes = modalAnalysis.calculateAllModes(w, l, currentHeight);
-        const isItuCompliant = analysis.checkRatio(inputs.wRatio, inputs.lRatio);
+
+        // DİNAMİK ORAN HESAPLAMASI (Anahtar Değişiklik)
+        // w ve l değerleri yukarıda moda göre (Existing veya Controlled) zaten belirleniyor.
+        // Bu yüzden güncel genişlik ve uzunluğu yüksekliğe bölerek o anki modelin gerçek oranını buluyoruz.
+        const currentRatioW = w / currentHeight;
+        const currentRatioL = l / currentHeight;
+
+        // Rozet artık girilen inputu değil, ekranda görünen modelin oranını test ediyor
+        const isItuCompliant = analysis.checkRatio(currentRatioW, currentRatioL);
 
         let areaWarning = null;
         if (currentArea < 20) areaWarning = '< 20m²';
@@ -93,6 +101,18 @@ export default function Calculator() {
 
         setInitialRoomData({ modes, isItuCompliant, areaWarning });
     }, [currentHeight, inputs.wRatio, inputs.lRatio, strategyMode, w, l, currentArea]);
+
+    useEffect(() => {
+        if (strategyMode === 'controlled' && result !== null) {
+            const updatedResult = analysis.splayTheRoomWithTheSameRatio(
+                inputs.wRatio,
+                inputs.lRatio,
+                controlledHeight,
+                inputs.angle
+            );
+            setResult(updatedResult);
+        }
+    }, [inputs.wRatio, inputs.lRatio, controlledHeight, inputs.angle, strategyMode]);
 
     const scrollToResults = () => {
         setTimeout(() => {
@@ -126,7 +146,8 @@ export default function Calculator() {
                     const newControlledEffectiveMinH = parseFloat(Math.max(newDesignMetrics?.hMin || 2.5, newOptimumMinH).toFixed(2));
 
                     setInputs(nextInputs);
-                    setControlledHeight(prev => Math.max(prev, newControlledEffectiveMinH));
+                    // DÜZELTME BURADA
+                    setControlledHeight(prev => parseFloat(Math.max(Number(prev), newControlledEffectiveMinH).toFixed(2)));
                 } else {
                     // Optimum modda artık yüksekliği ezmiyoruz, sadece oranları güncelliyoruz
                     setInputs(nextInputs);
@@ -175,9 +196,9 @@ export default function Calculator() {
             const newControlledEffectiveMinH = parseFloat(Math.max(newDesignMetrics?.hMin || 2.5, newOptimumMinH).toFixed(2));
 
             setInputs(nextInputs);
-            setControlledHeight(newControlledEffectiveMinH);
+            // DÜZELTME BURADA: Sadece mevcut yükseklik yeni minimumun altında kalırsa yükselt. Değilse dokunma!
+            setControlledHeight(prev => parseFloat(Math.max(Number(prev), newControlledEffectiveMinH).toFixed(2)));
         } else {
-            // Optimum modda yüksekliği olduğu gibi koruyoruz
             setInputs(nextInputs);
         }
     };
@@ -447,20 +468,38 @@ export default function Calculator() {
                             {strategyMode === 'controlled' ? 'Outer Rectangular Response' : 'Initial Room Response'}
                         </h2>
                         <p className="text-xs text-slate-200 font-mono">Dimensions: {w.toFixed(2)} m x {l.toFixed(2)} m x {currentHeight} m</p>
+                        <span className="text-slate-400 text-xs">
+                            1 : {(w / currentHeight).toFixed(2)} : {(l / currentHeight).toFixed(2)}
+                        </span>
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 border border-slate-700">
-                        <span className="text-slate-400 font-sans">ITU Standards:</span>
-                        {initialRoomData.areaWarning ? (
+                    {strategyMode === 'controlled' ? (
+                        // CONTROLLED MOD: Sadece alan sınırlarını (20-60m2) kontrol et, oran (ratio) değerlendirmesi yapma
+                        initialRoomData.areaWarning ? (
+                            <span className="text-rose-400 flex items-center gap-1 font-mono">
+                                <MdWarning size={15} /> Warning (Area {initialRoomData.areaWarning})
+                            </span>
+                        ) : (
+                            <span className="text-cyan-100 font-mono flex items-center gap-1 text-sm">
+                                No warning
+                            </span>
+                        )
+                    ) : (
+                        // OPTIMUM MOD: Hem alan hem de ITU oran değerlendirmesi yap
+                        initialRoomData.areaWarning ? (
                             <span className="text-rose-400 flex items-center gap-1 font-mono">
                                 <MdWarning size={15} /> Non-Compliant (Area {initialRoomData.areaWarning})
                             </span>
                         ) : initialRoomData.isItuCompliant ? (
-                            <span className="text-emerald-400 flex items-center gap-1 font-mono"><MdCheckCircle size={15} /> Compliant</span>
+                            <span className="text-emerald-400 flex items-center gap-1 font-mono">
+                                <MdCheckCircle size={15} /> Compliant
+                            </span>
                         ) : (
-                            <span className="text-rose-400 flex items-center gap-1 font-mono"><MdCancel size={15} /> Non-Compliant (Ratio)</span>
-                        )}
-                    </div>
+                            <span className="text-rose-400 flex items-center gap-1 font-mono">
+                                <MdCancel size={15} /> Non-Compliant (Ratio)
+                            </span>
+                        )
+                    )}
                 </div>
 
                 <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-sm min-h-[120px]">
@@ -489,7 +528,7 @@ export default function Calculator() {
             {result && (
                 <div ref={resultRef} className="p-5 bg-white border border-slate-200 rounded-xl shadow-sm space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <h2 className="text-lg font-bold flex items-center gap-2 border-b pb-2">
-                        <span className="w-1.5 h-5 bg-blue-500 rounded-full"></span> Calculation Results
+                        <span className="w-1.5 h-5 bg-blue-500 rounded-full"></span> Outer Dimensions
                     </h2>
 
                     {activeTab === 'optimum' && (
@@ -643,6 +682,9 @@ export default function Calculator() {
                                                 <p className="text-xs text-slate-400 font-mono">
                                                     Averaged Dimensions: {splayedW.toFixed(2)} m x {splayedL.toFixed(2)} m x {currentHeight} m
                                                 </p>
+                                                <span className="text-slate-500 text-sm">
+                                                    1 : {safeSw.toFixed(2)} : {safeSL.toFixed(2)}
+                                                </span>
                                             </div>
 
                                         </div>
