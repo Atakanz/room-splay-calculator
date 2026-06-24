@@ -528,7 +528,7 @@ export default function Calculator() {
             {result && (
                 <div ref={resultRef} className="p-5 bg-white border border-slate-200 rounded-xl shadow-sm space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <h2 className="text-lg font-bold flex items-center gap-2 border-b pb-2">
-                        <span className="w-1.5 h-5 bg-blue-500 rounded-full"></span> Outer Dimensions
+                        <span className="w-1.5 h-5 bg-blue-500 rounded-full"></span> {strategyMode === 'controlled' ? "Outer Dimensions" : "Splaying Results"}
                     </h2>
 
                     {activeTab === 'optimum' && (
