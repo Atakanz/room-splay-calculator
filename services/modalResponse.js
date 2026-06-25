@@ -19,8 +19,8 @@ export function calculateAllModes(width, length, height) {
                 if (nx === 0 && ny === 0 && nz === 0) continue;
 
                 const freq = (SPEED_OF_SOUND / 2) * Math.sqrt(
-                    Math.pow(nx / width, 2) +
-                    Math.pow(ny / length, 2) +
+                    Math.pow(nx / length, 2) +
+                    Math.pow(ny / width, 2) +
                     Math.pow(nz / height, 2)
                 );
 
