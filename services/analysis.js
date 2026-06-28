@@ -69,7 +69,7 @@ export function calculateDesignPhaseMetrics(wRatio, lRatio, angle_deg) {
 
     const denominator = sPrimeW - (2 * sPrimeL * Math.tan(angle_rad));
     const hMinFormula = denominator > 0 ? (4 / denominator) : 2.5;
-    const hMin = parseFloat(Math.max(2.5, hMinFormula).toFixed(2));
+    const hMin = parseFloat(Math.max(2.5, hMinFormula));
 
     return { sPrimeW, sPrimeL, hMin };
 }
@@ -88,10 +88,10 @@ export function splayTheRoomWithTheSameRatio(wRatio, lRatio, h, angle_deg) {
     return {
         angle_deg,
         width: {
-            front: width_front.toFixed(2),
-            rear: width_rear.toFixed(2)
+            front: width_front,
+            rear: width_rear,
         },
-        length: length.toFixed(2),
+        length: length,
         w_ratio: metrics.sPrimeW,
         l_ratio: metrics.sPrimeL
     };

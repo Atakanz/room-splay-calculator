@@ -18,9 +18,7 @@ export default function Calculator() {
         angle: 3
     });
 
-    // Design Phase dinamik korumalı tavan yüksekliği state'i
     const [controlledHeight, setControlledHeight] = useState(3);
-
     const [result, setResult] = useState(null);
     const [activeTab, setActiveTab] = useState(null);
     const [selectedModalData, setSelectedModalData] = useState(null);
@@ -28,71 +26,69 @@ export default function Calculator() {
 
     const resultRef = useRef(null);
 
-    // Aktif moda göre oda tavan yüksekliği ve fiziksel boyut hesaplamaları
-    const designMetrics = analysis.calculateDesignPhaseMetrics(inputs.wRatio, inputs.lRatio, inputs.angle);
-
-    // --- 1. GÜVENLİK KALKANI (TYPING SHIELD) ---
-    const parsedWRatio = Number(inputs.wRatio);
-    const parsedLRatio = Number(inputs.lRatio);
-    const parsedHeight = Number(inputs.height);
+    // --- 1. GÜVENLİK KALKANI VE VALİDASYON ---
+    const parsedWRatio = inputs.wRatio !== '' ? Number(inputs.wRatio) : NaN;
+    const parsedLRatio = inputs.lRatio !== '' ? Number(inputs.lRatio) : NaN;
+    const parsedHeight = inputs.height !== '' ? Number(inputs.height) : NaN;
 
     const isInputComplete =
-        Number.isFinite(parsedWRatio) &&
-        Number.isFinite(parsedLRatio) &&
+        !isNaN(parsedWRatio) &&
+        !isNaN(parsedLRatio) &&
         parsedWRatio >= 0.5 &&
         parsedLRatio >= 0.5;
 
+    // Input tamamlanmadıysa servislerin çökmemesi için güvenli fallback değerleri
     const safeSw = isInputComplete ? parsedWRatio : 1.23;
     const safeSL = isInputComplete ? parsedLRatio : 1.4;
-    const rawInputHeight = Number.isFinite(parsedHeight) ? Math.max(0.1, parsedHeight) : 2.5;
+    const rawInputHeight = !isNaN(parsedHeight) ? Math.max(0.1, parsedHeight) : 2.5;
 
-    const hMinArea = isInputComplete
-        ? Math.sqrt(20 / (safeSw * safeSL))
-        : 2.5;
+    // Geometrik metrikleri sadece girdi geçerliyse hesapla (Tutarsızlık 1 Çözümü)
+    const designMetrics = isInputComplete
+        ? analysis.calculateDesignPhaseMetrics(safeSw, safeSL, Number(inputs.angle || 0))
+        : null;
 
-    const optimumMinH = Number(
-        Math.max(2.5, hMinArea).toFixed(2)
-    );
+    const hMinArea = isInputComplete ? Math.sqrt(20 / (safeSw * safeSL)) : 2.5;
+    const optimumMinH = Number(Math.max(2.5, hMinArea).toFixed(2));
+    const controlledEffectiveMinH = Number(Math.max(designMetrics?.hMin || 2.5, optimumMinH).toFixed(2));
 
-    const controlledEffectiveMinH = Number(
-        Math.max(designMetrics?.hMin || 2.5, optimumMinH).toFixed(2)
-    );
-
-    // Optimum modda artık 20m² kuralı tavan yüksekliğini zorla DEĞİŞTİRMİYOR
     const currentHeight = strategyMode === 'controlled'
         ? Math.max(controlledHeight, controlledEffectiveMinH)
         : rawInputHeight;
 
-    const w = strategyMode === 'controlled' ? (designMetrics.sPrimeW * currentHeight) : (currentHeight * safeSw);
-    const l = strategyMode === 'controlled' ? (designMetrics.sPrimeL * currentHeight) : (currentHeight * safeSL);
+    let w = currentHeight * safeSw;
+    let l = currentHeight * safeSL;
+
+    if (strategyMode === 'controlled' && isInputComplete && designMetrics) {
+        w = designMetrics.sPrimeW * currentHeight;
+        l = designMetrics.sPrimeL * currentHeight;
+    }
     const currentArea = w * l;
 
-    // Splayed Model Response Hesaplamaları (Design Phase için)
     const splayedW = currentHeight * safeSw;
     const splayedL = currentHeight * safeSL;
-    const splayedModes = strategyMode === 'controlled' ? modalAnalysis.calculateAllModes(splayedW, splayedL, currentHeight) : [];
+    console.log("avarage", splayedW, splayedL)
+    const splayedModes = (strategyMode === 'controlled' && isInputComplete)
+        ? modalAnalysis.calculateAllModes(splayedW.toFixed(2), splayedL.toFixed(2), currentHeight)
+        : [];
 
-    // Sadece Controlled modda hMin sınırını takip etsin
+    // Controlled modda hMin sınır takibi
     useEffect(() => {
-        if (strategyMode !== 'controlled') return;
+        if (strategyMode !== 'controlled' || !isInputComplete) return;
 
         setControlledHeight(prev => {
             const next = Math.max(Number(prev) || 0, controlledEffectiveMinH);
             return Number(next.toFixed(2));
         });
-    }, [strategyMode, controlledEffectiveMinH]);
+    }, [strategyMode, controlledEffectiveMinH, isInputComplete]);
 
-    // Modal analiz ve ITU uyumluluk takibi (Alan 20-60 sınırları dahil)
+    // Modal analiz ve ITU uyumluluk takibi (Tutarsızlık 2 Çözümü)
     useEffect(() => {
-        const modes = modalAnalysis.calculateAllModes(w, l, currentHeight);
-
-        // DİNAMİK ORAN HESAPLAMASI (Anahtar Değişiklik)
-        // w ve l değerleri yukarıda moda göre (Existing veya Controlled) zaten belirleniyor.
-        // Bu yüzden güncel genişlik ve uzunluğu yüksekliğe bölerek o anki modelin gerçek oranını buluyoruz.
+        // Eğer input tam değilse hesaplama yapma, arayüzü kirletme
+        if (!isInputComplete) return;
+        console.log("initial", w, l)
+        const modes = modalAnalysis.calculateAllModes(w.toFixed(2), l.toFixed(2), currentHeight);
         const currentRatioW = w / currentHeight;
         const currentRatioL = l / currentHeight;
-
-        // Rozet artık girilen inputu değil, ekranda görünen modelin oranını test ediyor
         const isItuCompliant = analysis.checkRatio(currentRatioW, currentRatioL);
 
         let areaWarning = null;
@@ -100,19 +96,24 @@ export default function Calculator() {
         else if (currentArea > 60) areaWarning = '> 60m²';
 
         setInitialRoomData({ modes, isItuCompliant, areaWarning });
-    }, [currentHeight, inputs.wRatio, inputs.lRatio, strategyMode, w, l, currentArea]);
+    }, [currentHeight, isInputComplete, w, l, currentArea]);
 
+    // Canlı veri değişim takibi (Tutarsızlık 3 Çözümü)
     useEffect(() => {
         if (strategyMode === 'controlled' && result !== null) {
+            if (!isInputComplete) {
+                setResult(null);
+                return;
+            }
             const updatedResult = analysis.splayTheRoomWithTheSameRatio(
-                inputs.wRatio,
-                inputs.lRatio,
+                parsedWRatio,
+                parsedLRatio,
                 controlledHeight,
-                inputs.angle
+                Number(inputs.angle || 0)
             );
             setResult(updatedResult);
         }
-    }, [inputs.wRatio, inputs.lRatio, controlledHeight, inputs.angle, strategyMode]);
+    }, [inputs.wRatio, inputs.lRatio, controlledHeight, inputs.angle, strategyMode, isInputComplete]);
 
     const scrollToResults = () => {
         setTimeout(() => {
@@ -121,19 +122,19 @@ export default function Calculator() {
     };
 
     const handleInputChange = (e) => {
-        if (e.target.name === 'height' && strategyMode === 'controlled') return;
-
         const val = e.target.value;
         const name = e.target.name;
 
         if (val === '') {
             setInputs({ ...inputs, [name]: '' });
+            setResult(null);
+            setActiveTab(null);
+            setSelectedModalData(null);
             return;
         }
 
         if (name !== 'height') {
             const nextInputs = { ...inputs, [name]: val };
-
             const currentW = Number(nextInputs.wRatio);
             const currentL = Number(nextInputs.lRatio);
             const isCurrentlyComplete = currentW >= 0.5 && currentL >= 0.5;
@@ -142,14 +143,12 @@ export default function Calculator() {
                 if (strategyMode === 'controlled') {
                     const newHMinArea = Math.sqrt(20 / (currentW * currentL));
                     const newOptimumMinH = parseFloat(Math.max(2.5, newHMinArea).toFixed(2));
-                    const newDesignMetrics = analysis.calculateDesignPhaseMetrics(nextInputs.wRatio, nextInputs.lRatio, nextInputs.angle);
+                    const newDesignMetrics = analysis.calculateDesignPhaseMetrics(currentW, currentL, Number(nextInputs.angle || 0));
                     const newControlledEffectiveMinH = parseFloat(Math.max(newDesignMetrics?.hMin || 2.5, newOptimumMinH).toFixed(2));
 
                     setInputs(nextInputs);
-                    // DÜZELTME BURADA
                     setControlledHeight(prev => parseFloat(Math.max(Number(prev), newControlledEffectiveMinH).toFixed(2)));
                 } else {
-                    // Optimum modda artık yüksekliği ezmiyoruz, sadece oranları güncelliyoruz
                     setInputs(nextInputs);
                 }
             } else {
@@ -172,7 +171,6 @@ export default function Calculator() {
                 setInputs(prev => {
                     const currentVal = Number(prev.height) || 0;
                     const newVal = direction === 'up' ? currentVal + stepValue : currentVal - stepValue;
-                    // Optimum modda 0.1'e kadar inebilir, 20m2 sınırı engellemez
                     return { ...prev, height: parseFloat(Math.max(0.1, newVal).toFixed(2)) };
                 });
             }
@@ -192,11 +190,10 @@ export default function Calculator() {
             const newSafeSL = Math.max(0.1, Number(nextInputs.lRatio) || 0.1);
             const newHMinArea = Math.sqrt(20 / (newSafeSw * newSafeSL));
             const newOptimumMinH = parseFloat(Math.max(2.5, newHMinArea).toFixed(2));
-            const newDesignMetrics = analysis.calculateDesignPhaseMetrics(nextInputs.wRatio, nextInputs.lRatio, nextInputs.angle);
+            const newDesignMetrics = analysis.calculateDesignPhaseMetrics(newSafeSw, newSafeSL, Number(nextInputs.angle || 0));
             const newControlledEffectiveMinH = parseFloat(Math.max(newDesignMetrics?.hMin || 2.5, newOptimumMinH).toFixed(2));
 
             setInputs(nextInputs);
-            // DÜZELTME BURADA: Sadece mevcut yükseklik yeni minimumun altında kalırsa yükselt. Değilse dokunma!
             setControlledHeight(prev => parseFloat(Math.max(Number(prev), newControlledEffectiveMinH).toFixed(2)));
         } else {
             setInputs(nextInputs);
@@ -234,12 +231,13 @@ export default function Calculator() {
     };
 
     const runOptimum = () => {
+        if (!isInputComplete) return;
         const origRes = analysis.calculateTheOptimumRatio(w, l, inputs.height);
         const enhancedRes = origRes.map(row => {
             const parts = row.message.split(':');
             const targetW = inputs.height * parseFloat(parts[1]);
             const targetL = inputs.height * parseFloat(parts[2]);
-            const targetArea = targetW * targetL; // İlgili açının alan hesabı
+            const targetArea = targetW * targetL;
             const targetModes = modalAnalysis.calculateAllModes(targetW, targetL, inputs.height);
             return {
                 ...row,
@@ -249,7 +247,6 @@ export default function Calculator() {
             };
         });
 
-        // En iyi seçimi yaparken hem güvenli oran hem de alan limitlerini (20-60m2) aşmayanları filtrele
         const safeCandidates = enhancedRes.filter(row => !row.warning && row.targetArea >= 20 && row.targetArea <= 60);
         let bestSplayAngle = null;
         let minClusters = Infinity;
@@ -276,7 +273,8 @@ export default function Calculator() {
     };
 
     const runControlled = () => {
-        const res = analysis.splayTheRoomWithTheSameRatio(inputs.wRatio, inputs.lRatio, controlledHeight, inputs.angle);
+        if (!isInputComplete) return;
+        const res = analysis.splayTheRoomWithTheSameRatio(parsedWRatio, parsedLRatio, controlledHeight, inputs.angle);
         setActiveTab('controlled');
         setResult(res);
         setSelectedModalData(null);
@@ -297,7 +295,7 @@ export default function Calculator() {
             {/* STRATEGY MODE SELECTION */}
             <div className="grid grid-cols-2 gap-3 mb-6 bg-slate-100 p-1.5 rounded-xl border border-slate-200/60">
                 <button
-                    onClick={() => { setStrategyMode('optimum'); setResult(null); }}
+                    onClick={() => { setStrategyMode('optimum'); setResult(null); setActiveTab(null); }}
                     className={`flex items-center justify-center gap-2 py-3 px-2 rounded-lg text-xs sm:text-sm font-semibold tracking-wide transition-all ${strategyMode === 'optimum' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'}`}
                 >
                     <MdLayers size={18} className="shrink-0" />
@@ -306,7 +304,7 @@ export default function Calculator() {
                     </span>
                 </button>
                 <button
-                    onClick={() => { setStrategyMode('controlled'); setResult(null); }}
+                    onClick={() => { setStrategyMode('controlled'); setResult(null); setActiveTab(null); }}
                     className={`flex items-center justify-center gap-2 py-3 px-2 rounded-lg text-xs sm:text-sm font-semibold tracking-wide transition-all ${strategyMode === 'controlled' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'}`}
                 >
                     <MdArchitecture size={18} className="shrink-0" />
@@ -366,10 +364,11 @@ export default function Calculator() {
                             <button
                                 type="button"
                                 disabled={
+                                    !isInputComplete ||
                                     (strategyMode === 'controlled' && controlledHeight <= controlledEffectiveMinH) ||
-                                    (strategyMode === 'optimum' && inputs.height <= 0.1)
+                                    (strategyMode === 'optimum' && Number(inputs.height) <= 0.1)
                                 }
-                                onClick={() => stepInput('height', 'down', 0.1)}
+                                onClick={() => stepInput('height', 'down', 0.01)}
                                 className={`px-3 py-1.5 font-bold transition-colors select-none
                                     ${strategyMode === 'controlled'
                                         ? 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 disabled:bg-indigo-50/30 disabled:text-indigo-400/50 disabled:cursor-not-allowed'
@@ -384,10 +383,9 @@ export default function Calculator() {
                                 step="0.1"
                                 value={strategyMode === 'controlled' ? controlledHeight : inputs.height}
                                 onChange={handleInputChange}
-                                readOnly={strategyMode === 'controlled'}
                                 className={`w-full p-1.5 text-sm text-center border-none outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${strategyMode === 'controlled' ? 'bg-indigo-50/40 text-indigo-900 font-semibold cursor-not-allowed' : ''}`}
                             />
-                            <button type="button" onClick={() => stepInput('height', 'up', 0.1)} className={`px-3 py-1.5 font-bold transition-colors ${strategyMode === 'controlled' ? 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>+</button>
+                            <button type="button" disabled={!isInputComplete} onClick={() => stepInput('height', 'up', 0.01)} className={`px-3 py-1.5 font-bold transition-colors ${strategyMode === 'controlled' ? 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 disabled:cursor-not-allowed' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 disabled:cursor-not-allowed'}`}>+</button>
                         </div>
                     </div>
 
@@ -423,11 +421,11 @@ export default function Calculator() {
 
                     <div className="pt-1">
                         {strategyMode === 'optimum' ? (
-                            <button onClick={runOptimum} className="w-full p-2.5 bg-slate-900 hover:bg-slate-950 text-white rounded-lg text-xs font-bold tracking-wider shadow-xs transition">
+                            <button onClick={runOptimum} disabled={!isInputComplete} className="w-full p-2.5 bg-slate-900 hover:bg-slate-950 disabled:bg-slate-400 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold tracking-wider shadow-xs transition">
                                 CALCULATE OPTIMUM ANGLES
                             </button>
                         ) : (
-                            <button onClick={runControlled} className="w-full p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold tracking-wider shadow-xs transition">
+                            <button onClick={runControlled} disabled={!isInputComplete} className="w-full p-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold tracking-wider shadow-xs transition">
                                 EXECUTE CONTROLLED GEOMETRY
                             </button>
                         )}
@@ -448,10 +446,10 @@ export default function Calculator() {
 
                     <div className={`${isChartVisible ? 'block' : 'hidden'} md:block p-4 h-[350px] md:h-[450px] flex flex-col justify-center animate-in fade-in duration-300 overflow-hidden`}>
                         <RoomComplianceChart inputs={inputs} highlightZone={highlightZone} outputs={{
-                            updatedSw: inputs.wRatio,
-                            updatedSL: inputs.lRatio,
-                            w_ratio: strategyMode === 'controlled' ? result?.w_ratio : null,
-                            l_ratio: strategyMode === 'controlled' ? result?.l_ratio : null,
+                            updatedSw: isInputComplete ? inputs.wRatio : 1.23,
+                            updatedSL: isInputComplete ? inputs.lRatio : 1.4,
+                            w_ratio: (strategyMode === 'controlled' && isInputComplete) ? result?.w_ratio : null,
+                            l_ratio: (strategyMode === 'controlled' && isInputComplete) ? result?.l_ratio : null,
                             zone: initialRoomData.isItuCompliant ? 'COMPLIANT_GREEN' : 'RECOVERABLE_YELLOW',
                             status: result?.status,
                             error: result?.is_under_4m
@@ -461,71 +459,71 @@ export default function Calculator() {
             </div>
 
             {/* INITIAL ROOM STATE VIEW WITH COMPLIANCE BADGE */}
-            <div className="mb-6 p-4 bg-slate-900 text-white rounded-xl shadow-md">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-700 pb-2 mb-3 gap-3">
-                    <div>
-                        <h2 className="text-xs font-bold uppercase tracking-wider text-shadow-olive-100">
-                            {strategyMode === 'controlled' ? 'Outer Rectangular Response' : 'Initial Room Response'}
-                        </h2>
-                        <p className="text-xs text-slate-200 font-mono">Dimensions: {w.toFixed(2)} m x {l.toFixed(2)} m x {currentHeight} m</p>
-                        <span className="text-slate-400 text-xs">
-                            1 : {(w / currentHeight).toFixed(2)} : {(l / currentHeight).toFixed(2)}
-                        </span>
+            {isInputComplete && (
+                <div className="mb-6 p-4 bg-slate-900 text-white rounded-xl shadow-md animate-in fade-in duration-200">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-700 pb-2 mb-3 gap-3">
+                        <div>
+                            <h2 className="text-xs font-bold uppercase tracking-wider text-shadow-olive-100">
+                                {strategyMode === 'controlled' ? 'Outer Rectangular Response' : 'Initial Room Response'}
+                            </h2>
+                            <p className="text-xs text-slate-200 font-mono">Dimensions: {w.toFixed(2)} m x {l.toFixed(2)} m x {currentHeight} m</p>
+                            <span className="text-slate-400 text-xs">
+                                1 : {(w / currentHeight).toFixed(2)} : {(l / currentHeight).toFixed(2)}
+                            </span>
+                        </div>
+
+                        {strategyMode === 'controlled' ? (
+                            initialRoomData.areaWarning ? (
+                                <span className="text-rose-400 flex items-center gap-1 font-mono">
+                                    <MdWarning size={15} /> Warning (Area {initialRoomData.areaWarning})
+                                </span>
+                            ) : (
+                                <span className="text-cyan-100 font-mono flex items-center gap-1 text-sm">
+                                    No warning
+                                </span>
+                            )
+                        ) : (
+                            initialRoomData.areaWarning ? (
+                                <span className="text-rose-400 flex items-center gap-1 font-mono">
+                                    <MdWarning size={15} /> Non-Compliant (Area {initialRoomData.areaWarning})
+                                </span>
+                            ) : initialRoomData.isItuCompliant ? (
+                                <span className="text-emerald-400 flex items-center gap-1 font-mono">
+                                    <MdCheckCircle size={15} /> Compliant
+                                </span>
+                            ) : (
+                                <span className="text-rose-400 flex items-center gap-1 font-mono">
+                                    <MdCancel size={15} /> Non-Compliant (Ratio)
+                                </span>
+                            )
+                        )}
                     </div>
 
-                    {strategyMode === 'controlled' ? (
-                        // CONTROLLED MOD: Sadece alan sınırlarını (20-60m2) kontrol et, oran (ratio) değerlendirmesi yapma
-                        initialRoomData.areaWarning ? (
-                            <span className="text-rose-400 flex items-center gap-1 font-mono">
-                                <MdWarning size={15} /> Warning (Area {initialRoomData.areaWarning})
-                            </span>
-                        ) : (
-                            <span className="text-cyan-100 font-mono flex items-center gap-1 text-sm">
-                                No warning
-                            </span>
-                        )
-                    ) : (
-                        // OPTIMUM MOD: Hem alan hem de ITU oran değerlendirmesi yap
-                        initialRoomData.areaWarning ? (
-                            <span className="text-rose-400 flex items-center gap-1 font-mono">
-                                <MdWarning size={15} /> Non-Compliant (Area {initialRoomData.areaWarning})
-                            </span>
-                        ) : initialRoomData.isItuCompliant ? (
-                            <span className="text-emerald-400 flex items-center gap-1 font-mono">
-                                <MdCheckCircle size={15} /> Compliant
-                            </span>
-                        ) : (
-                            <span className="text-rose-400 flex items-center gap-1 font-mono">
-                                <MdCancel size={15} /> Non-Compliant (Ratio)
-                            </span>
-                        )
-                    )}
-                </div>
-
-                <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-sm min-h-[120px]">
-                    <p className="text-[11px] uppercase text-slate-400 font-bold mb-2">(&lt;200Hz)</p>
-                    <div className="max-h-44 overflow-y-auto grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-xs pr-1">
-                        {initialRoomData.modes.map((m, idx) => (
-                            <div key={idx} className="flex flex-col p-1.5 rounded bg-slate-900/50 border border-slate-700/60 justify-between">
-                                <div className="flex justify-between items-center">
-                                    <span className={m.type === 'Axial' ? 'text-red-400 font-bold' : 'text-slate-400'}>
-                                        {m.freq} Hz <span className="text-[9px] font-sans opacity-70">({m.type[0]})</span>
-                                    </span>
-                                    <span className="text-slate-500 text-[10px]">{m.label}</span>
-                                </div>
-                                {m.type === 'Axial' && m.clustering && (
-                                    <div className="text-[9px] text-rose-400 mt-1 bg-rose-950/40 px-1 py-0.5 rounded border border-rose-900/50 truncate" title={m.clusteringDetails}>
-                                        ⚠️ Axial Cluster (±5%)
+                    <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-sm min-h-[120px]">
+                        <p className="text-[11px] uppercase text-slate-400 font-bold mb-2">(&lt;200Hz)</p>
+                        <div className="max-h-44 overflow-y-auto grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-xs pr-1">
+                            {initialRoomData.modes.map((m, idx) => (
+                                <div key={idx} className="flex flex-col p-1.5 rounded bg-slate-900/50 border border-slate-700/60 justify-between">
+                                    <div className="flex justify-between items-center">
+                                        <span className={m.type === 'Axial' ? 'text-red-400 font-bold' : 'text-slate-400'}>
+                                            {m.freq} Hz <span className="text-[9px] font-sans opacity-70">({m.type[0]})</span>
+                                        </span>
+                                        <span className="text-slate-500 text-[10px]">{m.label}</span>
                                     </div>
-                                )}
-                            </div>
-                        ))}
+                                    {m.type === 'Axial' && m.clustering && (
+                                        <div className="text-[9px] text-rose-400 mt-1 bg-rose-950/40 px-1 py-0.5 rounded border border-rose-900/50 truncate" title={m.clusteringDetails}>
+                                            ⚠️ Axial Cluster (±5%)
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* RESULTS CONTAINER */}
-            {result && (
+            {result && isInputComplete && (
                 <div ref={resultRef} className="p-5 bg-white border border-slate-200 rounded-xl shadow-sm space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <h2 className="text-lg font-bold flex items-center gap-2 border-b pb-2">
                         <span className="w-1.5 h-5 bg-blue-500 rounded-full"></span> {strategyMode === 'controlled' ? "Outer Dimensions" : "Splaying Results"}
@@ -534,7 +532,6 @@ export default function Calculator() {
                     {activeTab === 'optimum' && (
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-                                {/* Sol Taraf: Matris Tablosu (5 Kolon) */}
                                 <div className="lg:col-span-5 max-h-[440px] overflow-y-auto border rounded-xl shadow-inner bg-white">
                                     <table className="w-full text-sm min-w-[360px]">
                                         <thead className="bg-slate-100 sticky top-0 shadow-sm z-10">
@@ -568,9 +565,9 @@ export default function Calculator() {
                                                         )}
                                                     </td>
                                                     <td className="p-2 flex flex-col items-center justify-center text-[10px] gap-0.5">
-                                                        {r.warning && <span className="text-amber-600 font-bold bg-amber-50 px-1 rounded border border-amber-200" title="Width is less than 4m">⚠️ &lt;4m</span>}
-                                                        {r.targetArea < 20 && <span className="text-rose-600 font-bold bg-rose-50 px-1 rounded border border-rose-200" title="Area is less than 20m²">⚠️ &lt;20m²</span>}
-                                                        {r.targetArea > 60 && <span className="text-amber-600 font-bold bg-amber-50 px-1 rounded border border-amber-200" title="Area is greater than 60m²">⚠️ &gt;60m²</span>}
+                                                        {r.warning && <span className="text-amber-600 font-bold bg-amber-50 px-1 rounded border border-amber-200">⚠️ &lt;4m</span>}
+                                                        {r.targetArea < 20 && <span className="text-rose-600 font-bold bg-rose-50 px-1 rounded border border-rose-200">⚠️ &lt;20m²</span>}
+                                                        {r.targetArea > 60 && <span className="text-amber-600 font-bold bg-amber-50 px-1 rounded border border-amber-200">⚠️ &gt;60m²</span>}
                                                         {!r.warning && r.targetArea >= 20 && r.targetArea <= 60 && <span className="text-emerald-600 font-medium text-xs">✅</span>}
                                                     </td>
                                                     <td className="p-2 text-center">
@@ -597,7 +594,6 @@ export default function Calculator() {
                                     </table>
                                 </div>
 
-                                {/* Sağ Taraf: Tıklanınca Açılan Akustik Detay Paneli (7 Kolon) */}
                                 <div className="lg:col-span-7 animate-in fade-in duration-300">
                                     {selectedModalData ? (
                                         <div className="p-4 bg-slate-900 text-white rounded-xl shadow-md border border-slate-800">
@@ -622,7 +618,7 @@ export default function Calculator() {
                                                                 <span className="text-slate-500 text-[10px]">{m.label}</span>
                                                             </div>
                                                             {m.type === 'Axial' && m.clustering && (
-                                                                <div className="text-[9px] text-rose-400 mt-1 bg-rose-950/40 px-1 py-0.5 rounded border border-rose-900/50 truncate" title={m.clusteringDetails}>
+                                                                <div className="text-[9px] text-rose-400 mt-1 bg-rose-950/40 px-1 py-0.5 rounded border border-rose-900/50 truncate">
                                                                     ⚠️ Axial Cluster (±5%)
                                                                 </div>
                                                             )}
@@ -644,34 +640,27 @@ export default function Calculator() {
 
                     {activeTab === 'controlled' && (
                         <div className="space-y-4">
-                            {/* Mevcut Numerik Sonuç Grid'i */}
                             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 font-mono text-sm animate-in zoom-in-95 duration-200">
+
+                                {/* <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
+                                    <p className="text-xs md:text-[10px] text-slate-500 uppercase font-sans tracking-wide">Width Front</p>
+                                    <p className="text-base md:text-sm font-semibold">{result.width.front.toFixed(2)} m</p>
+                                </div> */}
+                                <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
+                                    <p className="text-xs md:text-[10px] text-slate-500 uppercase font-sans tracking-wide">Width</p>
+                                    <p className="text-base md:text-sm font-semibold">{result.width.rear.toFixed(2)} m</p>
+                                </div>
+                                <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
+                                    <p className="text-xs md:text-[10px] text-slate-500 uppercase font-sans tracking-wide">Length</p>
+                                    <p className="text-base md:text-sm font-semibold">{result.length.toFixed(2)} m</p>
+                                </div>
                                 <div className="p-3 md:p-2.5 bg-indigo-50/50 border border-indigo-100 rounded">
                                     <p className="text-xs md:text-[10px] text-indigo-500 uppercase font-sans tracking-wide">Angle</p>
                                     <p className="text-base md:text-sm font-semibold">{result.angle_deg}°</p>
                                 </div>
-                                <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
-                                    <p className="text-xs md:text-[10px] text-slate-500 uppercase font-sans tracking-wide">Width Front</p>
-                                    <p className="text-base md:text-sm font-semibold">{result.width.front} m</p>
-                                </div>
-                                <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
-                                    <p className="text-xs md:text-[10px] text-slate-500 uppercase font-sans tracking-wide">Width Rear</p>
-                                    <p className="text-base md:text-sm font-semibold">{result.width.rear} m</p>
-                                </div>
-                                <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
-                                    <p className="text-xs md:text-[10px] text-slate-500 uppercase font-sans tracking-wide">Length</p>
-                                    <p className="text-base md:text-sm font-semibold">{result.length} m</p>
-                                </div>
                             </div>
 
-                            {/* YENİ EKLENEN ANIMASYONLU GEOMETRİK ÇİZİM VE SPLAYED MODEL PANELİ */}
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-                                {/* Görselleştirici (Daha Derli Toplu Alan) */}
-                                <div className="lg:col-span-5 bg-slate-50/50 rounded-xl border border-slate-100 p-2 shadow-inner">
-                                    <ControlledRoomVisualizer result={result} />
-                                </div>
-
-                                {/* Splayed Model Ortalaması (Hedeflenen Ratio Sonucu) */}
                                 <div className="lg:col-span-7 animate-in fade-in duration-300">
                                     <div className="p-4 bg-slate-900 text-white rounded-xl shadow-md border border-slate-800">
                                         <div className="flex justify-between items-center border-b border-slate-700 pb-2 mb-3">
@@ -686,7 +675,6 @@ export default function Calculator() {
                                                     1 : {safeSw.toFixed(2)} : {safeSL.toFixed(2)}
                                                 </span>
                                             </div>
-
                                         </div>
 
                                         <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-sm min-h-[120px]">
@@ -701,7 +689,7 @@ export default function Calculator() {
                                                             <span className="text-slate-500 text-[10px]">{m.label}</span>
                                                         </div>
                                                         {m.type === 'Axial' && m.clustering && (
-                                                            <div className="text-[9px] text-rose-400 mt-1 bg-rose-950/40 px-1 py-0.5 rounded border border-rose-900/50 truncate" title={m.clusteringDetails}>
+                                                            <div className="text-[9px] text-rose-400 mt-1 bg-rose-950/40 px-1 py-0.5 rounded border border-rose-900/50 truncate">
                                                                 ⚠️ Axial Cluster (±5%)
                                                             </div>
                                                         )}
@@ -709,6 +697,28 @@ export default function Calculator() {
                                                 ))}
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                                <div className="lg:col-span-5 bg-slate-50/50 rounded-xl border border-slate-100 shadow-inner">
+                                    <ControlledRoomVisualizer result={result} />
+                                </div>
+                                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 font-mono text-sm animate-in zoom-in-95 duration-200">
+
+                                    {/* <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
+                                    <p className="text-xs md:text-[10px] text-slate-500 uppercase font-sans tracking-wide">Width Front</p>
+                                    <p className="text-base md:text-sm font-semibold">{result.width.front.toFixed(2)} m</p>
+                                </div> */}
+                                    <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
+                                        <p className="text-xs md:text-[10px] text-slate-500 uppercase font-sans tracking-wide">Width Rear</p>
+                                        <p className="text-base md:text-sm font-semibold">{result.width.rear.toFixed(2)} m</p>
+                                    </div>
+                                    <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
+                                        <p className="text-xs md:text-[10px] text-slate-500 uppercase font-sans tracking-wide">Length</p>
+                                        <p className="text-base md:text-sm font-semibold">{splayedL.toFixed(2)} m</p>
+                                    </div>
+                                    <div className="p-3 md:p-2.5 bg-indigo-50/50 border border-indigo-100 rounded">
+                                        <p className="text-xs md:text-[10px] text-indigo-500 uppercase font-sans tracking-wide">Width Front</p>
+                                        <p className="text-base md:text-sm font-semibold">{result.width.front.toFixed(2)} m</p>
                                     </div>
                                 </div>
                             </div>
