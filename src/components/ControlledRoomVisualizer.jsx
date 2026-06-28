@@ -95,7 +95,7 @@ export default function ControlledRoomVisualizer({ result }) {
                         transform={`rotate(-90 ${rLeftTop.x - 20} ${centerY})`}
                         className="fill-slate-400 text-[18px] font-bold"
                     >
-                        Length: {(lengthBase * Math.cos(currentAngleRad)).toFixed(2)} m
+                        Length: {(lengthBase / Math.cos(currentAngleRad)).toFixed(2)} m
                     </text>
                     <text x={centerX} y={rLeftBot.y + 25} textAnchor="middle" className="fill-slate-400 font-bold text-[18px]">
                         Width Front: {dynamicWFront.toFixed(2)} m
