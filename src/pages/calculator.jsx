@@ -640,12 +640,7 @@ export default function Calculator() {
 
                     {activeTab === 'controlled' && (
                         <div className="space-y-4">
-                            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 font-mono text-sm animate-in zoom-in-95 duration-200">
-
-                                {/* <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
-                                    <p className="text-xs md:text-[10px] text-slate-500 uppercase font-sans tracking-wide">Width Front</p>
-                                    <p className="text-base md:text-sm font-semibold">{result.width.front.toFixed(2)} m</p>
-                                </div> */}
+                            <div className="grid grid-cols-3 lg:grid-cols-5 gap-3 font-mono text-sm animate-in zoom-in-95 duration-200">
                                 <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
                                     <p className="text-xs md:text-[10px] text-indigo-500 uppercase font-sans tracking-wide">Width</p>
                                     <p className="text-base md:text-sm font-semibold">{result.width.rear.toFixed(2)} m</p>
@@ -702,24 +697,20 @@ export default function Calculator() {
                                 <div className="lg:col-span-5 bg-slate-50/50 rounded-xl border border-slate-100 shadow-inner">
                                     <ControlledRoomVisualizer result={result} />
                                 </div>
-                                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 font-mono text-sm animate-in zoom-in-95 duration-200">
 
-                                    {/* <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
-                                    <p className="text-xs md:text-[10px] text-slate-500 uppercase font-sans tracking-wide">Width Front</p>
-                                    <p className="text-base md:text-sm font-semibold">{result.width.front.toFixed(2)} m</p>
-                                </div> */}
-                                    <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
-                                        <p className="text-xs md:text-[10px] text-indigo-500 uppercase font-sans tracking-wide">Width Rear</p>
-                                        <p className="text-base md:text-sm font-semibold">{result.width.rear.toFixed(2)} m</p>
-                                    </div>
-                                    <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
-                                        <p className="text-xs md:text-[10px] text-indigo-500 uppercase font-sans tracking-wide">Length</p>
-                                        <p className="text-base md:text-sm font-semibold">{splayedL.toFixed(2)} m</p>
-                                    </div>
-                                    <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
-                                        <p className="text-xs md:text-[10px] text-indigo-500 uppercase font-sans tracking-wide">Width Front</p>
-                                        <p className="text-base md:text-sm font-semibold">{result.width.front.toFixed(2)} m</p>
-                                    </div>
+                            </div>
+                            <div className="grid grid-cols-3 lg:grid-cols-5 gap-3 font-mono text-sm animate-in zoom-in-95 duration-200">
+                                <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
+                                    <p className="text-xs md:text-[10px] text-indigo-500 uppercase font-sans tracking-wide">Width</p>
+                                    <p className="text-base md:text-sm font-semibold">{result.width.rear.toFixed(2)} m</p>
+                                </div>
+                                <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
+                                    <p className="text-xs md:text-[10px] text-indigo-500 uppercase font-sans tracking-wide">Length</p>
+                                    <p className="text-base md:text-sm font-semibold">{result.length.toFixed(2)} m</p>
+                                </div>
+                                <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
+                                    <p className="text-xs md:text-[10px] text-indigo-500 uppercase font-sans tracking-wide">Angle</p>
+                                    <p className="text-base md:text-sm font-semibold">{result.angle_deg}°</p>
                                 </div>
                             </div>
                         </div>
