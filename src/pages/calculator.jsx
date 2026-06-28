@@ -464,7 +464,7 @@ export default function Calculator() {
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-700 pb-2 mb-3 gap-3">
                         <div>
                             <h2 className="text-xs font-bold uppercase tracking-wider text-shadow-olive-100">
-                                {strategyMode === 'controlled' ? 'Outer Rectangular Response' : 'Initial Room Response'}
+                                {strategyMode === 'controlled' ? 'Initial Rectangular Dimensions' : 'Initial Room Response'}
                             </h2>
                             <p className="text-xs text-slate-200 font-mono">Dimensions: {w.toFixed(2)} m x {l.toFixed(2)} m x {currentHeight} m</p>
                             <span className="text-slate-400 text-xs">
@@ -526,7 +526,7 @@ export default function Calculator() {
             {result && isInputComplete && (
                 <div ref={resultRef} className="p-5 bg-white border border-slate-200 rounded-xl shadow-sm space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <h2 className="text-lg font-bold flex items-center gap-2 border-b pb-2">
-                        <span className="w-1.5 h-5 bg-blue-500 rounded-full"></span> {strategyMode === 'controlled' ? "Outer Dimensions" : "Splaying Results"}
+                        <span className="w-1.5 h-5 bg-blue-500 rounded-full"></span> {strategyMode === 'controlled' ? "Initial Rectangular Dimensions" : "Splaying Results"}
                     </h2>
 
                     {activeTab === 'optimum' && (
@@ -630,7 +630,7 @@ export default function Calculator() {
                                     ) : (
                                         <div className="h-[200px] flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl text-slate-400 p-4 text-center bg-slate-50/40">
                                             <MdAssessment size={32} className="text-slate-300 mb-2 animate-pulse" />
-                                            <p className="text-xs font-medium">Select any row from the matrix table to visualize targeted modal distributions.</p>
+                                            <p className="text-xs font-medium">Select any row to visualize potential modal distributions.</p>
                                         </div>
                                     )}
                                 </div>
@@ -699,6 +699,9 @@ export default function Calculator() {
                                 </div>
 
                             </div>
+                            <h2 className="text-lg font-bold flex items-center gap-2 border-b pb-2">
+                                <span className="w-1.5 h-5 bg-blue-500 rounded-full"></span> Result - Splayed Model Dimensions
+                            </h2>
                             <div className="grid grid-cols-3 lg:grid-cols-5 gap-3 font-mono text-sm animate-in zoom-in-95 duration-200">
                                 <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
                                     <p className="text-xs md:text-[10px] text-indigo-500 uppercase font-sans tracking-wide">Width Rear</p>
