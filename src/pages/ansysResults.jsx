@@ -40,7 +40,7 @@ export default function AnsysResult() {
                     <h1 className="text-xl md:text-3xl font-bold text-slate-900 mb-4 leading-tight">
                         "Acoustic Simulation Data & Room Analysis"                    </h1>
                     <p className="text-sm text-slate-600 max-w-4xl leading-relaxed text-justify">
-                        "This section presents the test results of our trapezoidal listening room model. We compared the room shape created by our Controlled Wall Splaying framework with 3D Finite Element Analysis (FEA) results from ANSYS Workbench to check its accuracy."                    </p>
+                        This section presents the test results of our trapezoidal listening room model. We compared the room shape created by our Controlled Wall Splaying framework with 3D Finite Element Analysis (FEA) results from ANSYS Workbench to check its accuracy.                  </p>
                 </header>
 
                 <div className="p-8 md:p-12 space-y-12">
@@ -71,7 +71,7 @@ export default function AnsysResult() {
 
                         {/* Technical Note Block */}
                         <div className="mt-6 bg-sky-50 border-l-4 border-sky-500 p-4 text-slate-800 italic text-xs leading-relaxed text-justify">
-                            "Mesh Grid and Frequency Settings: To get accurate results at high frequencies, we used a mesh size of 0.2 m. This means we have 6 mesh elements for each sound wave at the highest frequency limit. This setup follows the standard rules (minimum 5 elements) and gives very accurate calculations up to 285 Hz."                        </div>
+                            Mesh Grid and Frequency Settings: To get accurate results at high frequencies, we used a mesh size of 0.2 m. This means we have 6 mesh elements for each sound wave at the highest frequency limit. This setup follows the standard rules (minimum 5 elements) and gives very accurate calculations up to 285 Hz.                       </div>
                     </section>
                     {/* 1. ROOM GEOMETRY & FRAMEWORK SPECIFICATIONS */}
                     <section>
