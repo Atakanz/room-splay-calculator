@@ -38,7 +38,7 @@ export default function AnsysResult() {
                         <span>Finite Element Method (FEM) Verification</span>
                     </div>
                     <h1 className="text-xl md:text-3xl font-bold text-slate-900 mb-4 leading-tight">
-                        "Acoustic Simulation Data & Room Analysis"                    </h1>
+                        Acoustic Simulation Data & Room Analysis                    </h1>
                     <p className="text-sm text-slate-600 max-w-4xl leading-relaxed text-justify">
                         This section presents the test results of our trapezoidal listening room model. We compared the room shape created by our Controlled Wall Splaying framework with 3D Finite Element Analysis (FEA) results from ANSYS Workbench to check its accuracy.                  </p>
                 </header>
