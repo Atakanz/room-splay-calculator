@@ -13,7 +13,7 @@ export default function FilteredModalTable({ rawData }) {
     }, [rangeFilter, rawData]);
 
     return (
-        <div className="w-full mt-12 max-w-6xl mx-auto p-6 bg-slate-900 rounded-2xl shadow-2xl border border-slate-800/80">
+        <div className="w-full mt-2 max-w-6xl mx-auto p-6 bg-slate-900 rounded-2xl shadow-2xl border border-slate-800/80">
 
             {/* Üst Alan: Başlık ve Dropdown */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-800">
@@ -78,8 +78,8 @@ export default function FilteredModalTable({ rawData }) {
                                 {/* ERROR Sütunu: Başlıkla aynı hizada sağa kilitli */}
                                 <td className="py-3 px-6 text-center align-middle">
                                     <div className="flex items-center justify-center gap-2.5 w-full">
-                                        <span className="text-rose-400/90 font-semibold">
-                                            %{row.error.toFixed(5)}
+                                        <span className="text-rose-300/90 font-semibold">
+                                            {row.error.toFixed(3)} %
                                         </span>
                                         <span className="inline-flex items-center justify-center text-[10px] font-sans font-bold bg-slate-800 text-slate-400 border border-slate-700 w-5 h-5 rounded shadow-sm shrink-0 uppercase">
                                             {row.type}
