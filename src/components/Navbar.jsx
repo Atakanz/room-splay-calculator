@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-// Logoyu import ediyoruz (Yolunu projenizdeki asset klasörüne göre kontrol edebilirsiniz)
+// Logoyu import ediyoruz
 import logo from '../assets/project_logo_2.png';
 
 export default function Navbar() {
@@ -65,11 +65,12 @@ export default function Navbar() {
         }
     };
 
-    const navLinkClass = "relative text-neutral-800 tracking-[0.15em] uppercase text-sm md:text-[18px] transition-colors duration-300 ease-in-out hover:text-black after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-[-6px] after:w-full after:h-[1px] after:bg-black after:scale-x-0 after:origin-center hover:after:scale-x-100 after:transition-transform after:duration-300 block py-4 md:py-0 text-center cursor-pointer";
+    // 🛠️ Mühendislik Tasarımına Uygun Yeni Klasör Sınıfı (Yazı tipi ve boşluk dengesi optimize edildi)
+    const navLinkClass = "relative text-slate-700 font-semibold tracking-wider uppercase text-xs md:text-[13px] transition-colors duration-300 ease-in-out hover:text-slate-950 after:content-[''] after:absolute after:left-1/2 after:-translate-x-1/2 after:bottom-[-8px] after:w-full after:h-[1.5px] after:bg-slate-950 after:scale-x-0 after:origin-center hover:after:scale-x-100 after:transition-transform after:duration-300 block py-4 md:py-0 text-center cursor-pointer select-none";
 
     return (
         <div className="sticky top-0 z-50">
-            <nav className="bg-white/70 backdrop-blur-xl px-6 md:px-12 py-4 border-b border-neutral-100/70 select-none transition-all duration-300">
+            <nav className="bg-white/70 backdrop-blur-xl px-6 md:px-12 py-3 border-b border-slate-100/80 select-none transition-all duration-300">
                 <style>{`
                     @keyframes elegantSpin {
                         0% { transform: translate(-50%, -50%) rotate(0deg); }
@@ -92,18 +93,17 @@ export default function Navbar() {
 
                 <div className="flex items-center justify-between max-w-7xl mx-auto relative">
 
-                    {/* SOL TARAFTAKİ LOGO (Masaüstü ve Menü Kapalıyken Mobil) */}
+                    {/* SOL TARAFTAKİ LOGO */}
                     <div className={`flex items-center transition-all duration-300 ${isOpen ? 'opacity-0 md:opacity-100 pointer-events-none' : 'opacity-100'}`}>
                         <a href="/" className="flex items-center">
-                            {/* 🛠️ DÜZELTME: translate-y kaldırıldı, h-12 ve md:h-16 ile dikey ezilmeden orantılı büyümesi sağlandı */}
-                            <img src={logo} alt="Project Logo" className="h-18 md:h-20 w-auto object-contain" />
+                            <img src={logo} alt="Project Logo" className="h-14 md:h-16 w-auto object-contain" />
                         </a>
                     </div>
 
-                    {/* ORTADAKİ LOGO (Menü Açıkken Mobilde Ortalanan) */}
+                    {/* ORTADAKİ LOGO (Mobil) */}
                     <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:hidden transition-all duration-300 ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
                         <a href="/" className="flex items-center">
-                            <img src={logo} alt="Project Logo" className="h-18 w-auto object-contain" />
+                            <img src={logo} alt="Project Logo" className="h-14 w-auto object-contain" />
                         </a>
                     </div>
 
@@ -115,16 +115,20 @@ export default function Navbar() {
                         </div>
                     </button>
 
-                    <div className="hidden md:flex items-center ml-auto gap-10">
+                    {/* MASAÜSTÜ LİNKLER - Gap mesafeleri ve hizalama sadeleştirildi */}
+                    <div className="hidden md:flex items-center ml-auto gap-8">
                         <a href="/" style={{ fontFamily: "base-font" }} onClick={() => setIsOpen(false)} className={navLinkClass}>PROJECT</a>
                         <a href="/calculator" style={{ fontFamily: "base-font" }} onClick={() => setIsOpen(false)} className={navLinkClass}>CALCULATOR</a>
+                        <a href="/fem-result" style={{ fontFamily: "base-font" }} onClick={() => setIsOpen(false)} className={navLinkClass}>FEM ANALYSIS</a>
                     </div>
                 </div>
 
+                {/* MOBİL MENÜ LİNKLERİ */}
                 <div className={`md:hidden transition-all duration-500 ease-in-out ${isOpen ? 'block mt-4 border-t border-neutral-100/70' : 'hidden'}`}>
                     <div className={`w-full px-2 pt-6 pb-4 flex flex-col gap-1 transition-all duration-500 ease-in-out origin-top ${isScrollingUp ? 'bg-white/10 backdrop-blur-3xl blur-[4px] opacity-40 scale-y-95 pointer-events-none' : 'bg-white/80 backdrop-blur-xl opacity-100 scale-y-100'}`}>
                         <a href="/" style={{ fontFamily: "base-font" }} onClick={() => setIsOpen(false)} className={navLinkClass}>ABOUT PROJECT</a>
                         <a href="/calculator" style={{ fontFamily: "base-font" }} onClick={() => setIsOpen(false)} className={navLinkClass}>CALCULATOR</a>
+                        <a href="/fem-result" style={{ fontFamily: "base-font" }} onClick={() => setIsOpen(false)} className={navLinkClass}>FEM ANALYSIS</a>
                     </div>
                 </div>
             </nav>
