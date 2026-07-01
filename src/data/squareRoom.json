@@ -1,0 +1,352 @@
+[
+    {
+        "mod": 1,
+        "ansys": 28.58,
+        "numeric": 28.583,
+        "error": 0.010495749,
+        "type": "A"
+    },
+    {
+        "mod": 2,
+        "ansys": 28.58,
+        "numeric": 28.583,
+        "error": 0.010495749,
+        "type": "A"
+    },
+    {
+        "mod": 3,
+        "ansys": 40.42,
+        "numeric": 40.423,
+        "error": 0.007421517,
+        "type": "T"
+    },
+    {
+        "mod": 4,
+        "ansys": 57.17,
+        "numeric": 57.167,
+        "error": 0.005247507,
+        "type": "A"
+    },
+    {
+        "mod": 5,
+        "ansys": 57.17,
+        "numeric": 57.167,
+        "error": 0.005247507,
+        "type": "A"
+    },
+    {
+        "mod": 6,
+        "ansys": 57.17,
+        "numeric": 57.167,
+        "error": 0.005247507,
+        "type": "A"
+    },
+    {
+        "mod": 7,
+        "ansys": 63.91,
+        "numeric": 63.914,
+        "error": 0.00625841,
+        "type": "T"
+    },
+    {
+        "mod": 8,
+        "ansys": 63.91,
+        "numeric": 63.914,
+        "error": 0.00625841,
+        "type": "T"
+    },
+    {
+        "mod": 9,
+        "ansys": 63.91,
+        "numeric": 63.914,
+        "error": 0.00625841,
+        "type": "T"
+    },
+    {
+        "mod": 10,
+        "ansys": 63.91,
+        "numeric": 63.914,
+        "error": 0.00625841,
+        "type": "T"
+    },
+    {
+        "mod": 11,
+        "ansys": 70.01,
+        "numeric": 70.015,
+        "error": 0.007141327,
+        "type": "O"
+    },
+    {
+        "mod": 12,
+        "ansys": 80.85,
+        "numeric": 80.846,
+        "error": 0.004947434,
+        "type": "T"
+    },
+    {
+        "mod": 13,
+        "ansys": 80.85,
+        "numeric": 80.846,
+        "error": 0.004947434,
+        "type": "T"
+    },
+    {
+        "mod": 14,
+        "ansys": 80.85,
+        "numeric": 80.846,
+        "error": 0.004947434,
+        "type": "T"
+    },
+    {
+        "mod": 15,
+        "ansys": 85.75,
+        "numeric": 85.75,
+        "error": 0.0,
+        "type": "A"
+    },
+    {
+        "mod": 16,
+        "ansys": 85.75,
+        "numeric": 85.75,
+        "error": 0.0,
+        "type": "O"
+    },
+    {
+        "mod": 17,
+        "ansys": 85.75,
+        "numeric": 85.751,
+        "error": 0.001166167,
+        "type": "O"
+    },
+    {
+        "mod": 18,
+        "ansys": 85.75,
+        "numeric": 85.751,
+        "error": 0.001166167,
+        "type": "A"
+    },
+    {
+        "mod": 19,
+        "ansys": 90.39,
+        "numeric": 90.389,
+        "error": 0.001106317,
+        "type": "T"
+    },
+    {
+        "mod": 20,
+        "ansys": 90.39,
+        "numeric": 90.389,
+        "error": 0.001106317,
+        "type": "T"
+    },
+    {
+        "mod": 21,
+        "ansys": 99.02,
+        "numeric": 99.016,
+        "error": 0.004039588,
+        "type": "O"
+    },
+    {
+        "mod": 22,
+        "ansys": 103.06,
+        "numeric": 103.06,
+        "error": 0.0,
+        "type": "T"
+    },
+    {
+        "mod": 23,
+        "ansys": 103.06,
+        "numeric": 103.06,
+        "error": 0.0,
+        "type": "T"
+    },
+    {
+        "mod": 24,
+        "ansys": 103.06,
+        "numeric": 103.06,
+        "error": 0.0,
+        "type": "T"
+    },
+    {
+        "mod": 25,
+        "ansys": 103.06,
+        "numeric": 103.06,
+        "error": 0.0,
+        "type": "T"
+    },
+    {
+        "mod": 26,
+        "ansys": 106.95,
+        "numeric": 106.95,
+        "error": 0.0,
+        "type": "O"
+    },
+    {
+        "mod": 27,
+        "ansys": 106.95,
+        "numeric": 106.95,
+        "error": 0.0,
+        "type": "O"
+    },
+    {
+        "mod": 28,
+        "ansys": 114.33,
+        "numeric": 114.34,
+        "error": 0.008745846,
+        "type": "A"
+    },
+    {
+        "mod": 29,
+        "ansys": 114.33,
+        "numeric": 114.34,
+        "error": 0.008745846,
+        "type": "A"
+    },
+    {
+        "mod": 30,
+        "ansys": 114.33,
+        "numeric": 114.34,
+        "error": 0.008745846,
+        "type": "A"
+    },
+    {
+        "mod": 31,
+        "ansys": 117.85,
+        "numeric": 117.85,
+        "error": 0.0,
+        "type": "T"
+    },
+    {
+        "mod": 32,
+        "ansys": 117.85,
+        "numeric": 117.85,
+        "error": 0.0,
+        "type": "T"
+    },
+    {
+        "mod": 33,
+        "ansys": 117.85,
+        "numeric": 117.85,
+        "error": 0.0,
+        "type": "T"
+    },
+    {
+        "mod": 34,
+        "ansys": 117.85,
+        "numeric": 117.85,
+        "error": 0.0,
+        "type": "O"
+    },
+    {
+        "mod": 35,
+        "ansys": 117.85,
+        "numeric": 117.85,
+        "error": 0.0,
+        "type": "O"
+    },
+    {
+        "mod": 36,
+        "ansys": 117.85,
+        "numeric": 117.85,
+        "error": 0.0,
+        "type": "T"
+    },
+    {
+        "mod": 37,
+        "ansys": 121.27,
+        "numeric": 121.27,
+        "error": 0.0,
+        "type": "O"
+    },
+    {
+        "mod": 38,
+        "ansys": 121.27,
+        "numeric": 121.27,
+        "error": 0.0,
+        "type": "T"
+    },
+    {
+        "mod": 39,
+        "ansys": 127.83,
+        "numeric": 127.83,
+        "error": 0.0,
+        "type": "T"
+    },
+    {
+        "mod": 40,
+        "ansys": 127.83,
+        "numeric": 127.83,
+        "error": 0.0,
+        "type": "T"
+    },
+    {
+        "mod": 41,
+        "ansys": 127.83,
+        "numeric": 127.83,
+        "error": 0.0,
+        "type": "T"
+    },
+    {
+        "mod": 42,
+        "ansys": 127.83,
+        "numeric": 127.83,
+        "error": 0.0,
+        "type": "T"
+    },
+    {
+        "mod": 43,
+        "ansys": 127.83,
+        "numeric": 127.83,
+        "error": 0.0,
+        "type": "T"
+    },
+    {
+        "mod": 44,
+        "ansys": 127.83,
+        "numeric": 127.83,
+        "error": 0.0,
+        "type": "T"
+    },
+    {
+        "mod": 45,
+        "ansys": 130.99,
+        "numeric": 130.99,
+        "error": 0.0,
+        "type": "O"
+    },
+    {
+        "mod": 46,
+        "ansys": 130.99,
+        "numeric": 130.99,
+        "error": 0.0,
+        "type": "O"
+    },
+    {
+        "mod": 47,
+        "ansys": 130.99,
+        "numeric": 130.99,
+        "error": 0.0,
+        "type": "O"
+    },
+    {
+        "mod": 48,
+        "ansys": 130.99,
+        "numeric": 130.99,
+        "error": 0.0,
+        "type": "O"
+    },
+    {
+        "mod": 49,
+        "ansys": 134.07,
+        "numeric": 134.07,
+        "error": 0.0,
+        "type": "O"
+    },
+    {
+        "mod": 50,
+        "ansys": 140.03,
+        "numeric": 140.03,
+        "error": 0.0,
+        "type": "O"
+    }
+]

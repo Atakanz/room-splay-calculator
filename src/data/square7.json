@@ -1,0 +1,352 @@
+[
+    {
+        "mod": 1,
+        "ansys": 28.592,
+        "numeric": 28.3,
+        "error": 1.021264689,
+        "type": "A"
+    },
+    {
+        "mod": 2,
+        "ansys": 31.978,
+        "numeric": 32.67,
+        "error": 2.118151209,
+        "type": "A"
+    },
+    {
+        "mod": 3,
+        "ansys": 44.251,
+        "numeric": 43.22,
+        "error": 2.32989085,
+        "type": "T"
+    },
+    {
+        "mod": 4,
+        "ansys": 56.963,
+        "numeric": 56.6,
+        "error": 0.637255763,
+        "type": "A"
+    },
+    {
+        "mod": 5,
+        "ansys": 57.167,
+        "numeric": 57.17,
+        "error": 0.005247507,
+        "type": "A"
+    },
+    {
+        "mod": 6,
+        "ansys": 62.389,
+        "numeric": 63.79,
+        "error": 2.196269008,
+        "type": "T"
+    },
+    {
+        "mod": 7,
+        "ansys": 63.918,
+        "numeric": 65.33,
+        "error": 2.161334762,
+        "type": "A"
+    },
+    {
+        "mod": 8,
+        "ansys": 65.503,
+        "numeric": 65.35,
+        "error": 0.233577088,
+        "type": "T"
+    },
+    {
+        "mod": 9,
+        "ansys": 65.929,
+        "numeric": 65.84,
+        "error": 0.134993705,
+        "type": "T"
+    },
+    {
+        "mod": 10,
+        "ansys": 72.292,
+        "numeric": 71.2,
+        "error": 1.510540585,
+        "type": "T"
+    },
+    {
+        "mod": 11,
+        "ansys": 74.15,
+        "numeric": 71.67,
+        "error": 3.344571814,
+        "type": "O"
+    },
+    {
+        "mod": 12,
+        "ansys": 80.702,
+        "numeric": 80.45,
+        "error": 0.312259919,
+        "type": "T"
+    },
+    {
+        "mod": 13,
+        "ansys": 84.619,
+        "numeric": 84.9,
+        "error": 0.330977621,
+        "type": "A"
+    },
+    {
+        "mod": 14,
+        "ansys": 84.965,
+        "numeric": 86.44,
+        "error": 1.706385932,
+        "type": "T"
+    },
+    {
+        "mod": 15,
+        "ansys": 87.262,
+        "numeric": 86.81,
+        "error": 0.517980335,
+        "type": "T"
+    },
+    {
+        "mod": 16,
+        "ansys": 88.393,
+        "numeric": 86.83,
+        "error": 1.768239566,
+        "type": "O"
+    },
+    {
+        "mod": 17,
+        "ansys": 90.884,
+        "numeric": 90.97,
+        "error": 0.09453666,
+        "type": "T"
+    },
+    {
+        "mod": 18,
+        "ansys": 92.538,
+        "numeric": 91.31,
+        "error": 1.327022412,
+        "type": "O"
+    },
+    {
+        "mod": 19,
+        "ansys": 93.628,
+        "numeric": 98.0,
+        "error": 4.46122449,
+        "type": "A"
+    },
+    {
+        "mod": 20,
+        "ansys": 102.41,
+        "numeric": 102.0,
+        "error": 0.400351528,
+        "type": "T"
+    },
+    {
+        "mod": 21,
+        "ansys": 105.27,
+        "numeric": 102.35,
+        "error": 2.773819702,
+        "type": "T"
+    },
+    {
+        "mod": 22,
+        "ansys": 105.92,
+        "numeric": 103.63,
+        "error": 2.162009063,
+        "type": "O"
+    },
+    {
+        "mod": 23,
+        "ansys": 107.37,
+        "numeric": 107.13,
+        "error": 0.223526125,
+        "type": "T"
+    },
+    {
+        "mod": 24,
+        "ansys": 107.72,
+        "numeric": 107.44,
+        "error": 0.25993316,
+        "type": "O"
+    },
+    {
+        "mod": 25,
+        "ansys": 108.77,
+        "numeric": 113.17,
+        "error": 3.887956172,
+        "type": "T"
+    },
+    {
+        "mod": 26,
+        "ansys": 114.34,
+        "numeric": 113.2,
+        "error": 0.997026412,
+        "type": "A"
+    },
+    {
+        "mod": 27,
+        "ansys": 114.5,
+        "numeric": 113.45,
+        "error": 0.917030568,
+        "type": "T"
+    },
+    {
+        "mod": 28,
+        "ansys": 116.11,
+        "numeric": 114.33,
+        "error": 1.53302024,
+        "type": "A"
+    },
+    {
+        "mod": 29,
+        "ansys": 117.86,
+        "numeric": 116.93,
+        "error": 0.78907178,
+        "type": "O"
+    },
+    {
+        "mod": 30,
+        "ansys": 118.5,
+        "numeric": 117.78,
+        "error": 0.607594937,
+        "type": "T"
+    },
+    {
+        "mod": 31,
+        "ansys": 118.72,
+        "numeric": 117.82,
+        "error": 0.758086253,
+        "type": "T"
+    },
+    {
+        "mod": 32,
+        "ansys": 120.36,
+        "numeric": 118.91,
+        "error": 1.204719176,
+        "type": "T"
+    },
+    {
+        "mod": 33,
+        "ansys": 121.12,
+        "numeric": 121.43,
+        "error": 0.255291114,
+        "type": "O"
+    },
+    {
+        "mod": 34,
+        "ansys": 121.95,
+        "numeric": 122.23,
+        "error": 0.229076332,
+        "type": "O"
+    },
+    {
+        "mod": 35,
+        "ansys": 122.6,
+        "numeric": 126.79,
+        "error": 3.304677025,
+        "type": "O"
+    },
+    {
+        "mod": 36,
+        "ansys": 127.74,
+        "numeric": 126.82,
+        "error": 0.720212933,
+        "type": "T"
+    },
+    {
+        "mod": 37,
+        "ansys": 127.98,
+        "numeric": 127.58,
+        "error": 0.312548836,
+        "type": "T"
+    },
+    {
+        "mod": 38,
+        "ansys": 129.42,
+        "numeric": 129.66,
+        "error": 0.185099491,
+        "type": "T"
+    },
+    {
+        "mod": 39,
+        "ansys": 130.25,
+        "numeric": 130.67,
+        "error": 0.321420372,
+        "type": "A"
+    },
+    {
+        "mod": 40,
+        "ansys": 131.44,
+        "numeric": 130.7,
+        "error": 0.562994522,
+        "type": "T"
+    },
+    {
+        "mod": 41,
+        "ansys": 131.52,
+        "numeric": 130.96,
+        "error": 0.425790754,
+        "type": "O"
+    },
+    {
+        "mod": 42,
+        "ansys": 131.57,
+        "numeric": 131.68,
+        "error": 0.083535844,
+        "type": "T"
+    },
+    {
+        "mod": 43,
+        "ansys": 131.98,
+        "numeric": 131.69,
+        "error": 0.219730262,
+        "type": "O"
+    },
+    {
+        "mod": 44,
+        "ansys": 133.93,
+        "numeric": 133.7,
+        "error": 0.171731502,
+        "type": "T"
+    },
+    {
+        "mod": 45,
+        "ansys": 136.28,
+        "numeric": 134.69,
+        "error": 1.166715586,
+        "type": "O"
+    },
+    {
+        "mod": 46,
+        "ansys": 137.0,
+        "numeric": 141.5,
+        "error": 3.180212014,
+        "type": "A"
+    },
+    {
+        "mod": 47,
+        "ansys": 142.45,
+        "numeric": 141.7,
+        "error": 0.526500527,
+        "type": "O"
+    },
+    {
+        "mod": 48,
+        "ansys": 142.88,
+        "numeric": 142.4,
+        "error": 0.335946249,
+        "type": "T"
+    },
+    {
+        "mod": 49,
+        "ansys": 143.33,
+        "numeric": 142.41,
+        "error": 0.641875392,
+        "type": "T"
+    },
+    {
+        "mod": 50,
+        "ansys": 143.41,
+        "numeric": 142.62,
+        "error": 0.55086814,
+        "type": "T"
+    }
+]
