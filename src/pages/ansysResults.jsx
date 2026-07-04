@@ -103,7 +103,7 @@ export default function AnsysResult() {
 
                         {/* Technical Note */}
                         <div className="bg-amber-50 border-l-4 border-amber-500 p-4 text-slate-800 italic text-xs leading-relaxed text-justify">
-                            In non-rectangular rooms, standard mesh grids lose their perfect square shapes at the corners. To capture the wall angles perfectly, a <strong>0.1 m Capture Proximity & Curvature</strong> setting was applied. Due to this geometric complexity, the calculation error shows small variations compared to simple rectangular rooms.
+                            In non-rectangular rooms, standard mesh grids lose their perfect square shapes at the corners. To capture the wall angles perfectly, a <strong>0.1 m Capture Proximity & Curvature</strong> setting was applied.
                         </div>
 
                         {/* Table 1 */}
