@@ -103,7 +103,7 @@ export default function AnsysResult() {
 
                         {/* Technical Note */}
                         <div className="bg-amber-50 border-l-4 border-amber-500 p-4 text-slate-800 italic text-xs leading-relaxed text-justify">
-                            <strong>Mesh & Discretization Error Note:</strong> In non-rectangular rooms, standard mesh grids lose their perfect square shapes at the corners. To capture the wall angles perfectly, a <strong>0.1 m Capture Proximity & Curvature</strong> setting was applied. Due to this geometric complexity, the calculation error shows small variations compared to simple rectangular rooms.
+                            In non-rectangular rooms, standard mesh grids lose their perfect square shapes at the corners. To capture the wall angles perfectly, a <strong>0.1 m Capture Proximity & Curvature</strong> setting was applied. Due to this geometric complexity, the calculation error shows small variations compared to simple rectangular rooms.
                         </div>
 
                         {/* Table 1 */}
@@ -146,7 +146,7 @@ export default function AnsysResult() {
                             </div>
 
                             <div className="bg-indigo-50 border-l-4 border-indigo-400 p-3 text-slate-800 italic text-[11px] leading-relaxed">
-                                💡 <strong>Low Error Rate Explanation:</strong> As shown in the table below, the simulation grid aligns perfectly with the straight, parallel walls. Because there are no complex angles yet, the discretization error is extremely low ($\sim0.0002\%$).
+                                💡 <strong>Low Error Rate Explanation:</strong> As shown in the table below, the simulation grid aligns perfectly with the straight, parallel walls. Because there are no complex angles yet, the Prediction error is extremely low ($\sim0.0002\%$).
                             </div>
 
                             <div className="pt-1">

@@ -49,7 +49,7 @@ export default function FilteredModalTable({ rawData }) {
                             <th className="w-[12%] py-3.5 px-4 font-bold text-center border-r border-slate-700/50">MODE</th>
                             <th className="w-[28%] py-3.5 px-6 font-bold text-center border-r border-slate-700/50">FEM ANALYSIS</th>
                             <th className="w-[28%] py-3.5 px-6 font-bold text-center border-r border-slate-700/50">NUMERIC ANALYSIS</th>
-                            <th className="w-[32%] py-3.5 px-6 font-bold text-center">DISCRETIZATION ERROR %</th>
+                            <th className="w-[32%] py-3.5 px-6 font-bold text-center">PREDICTION ERROR %</th>
                         </tr>
                     </thead>
 
