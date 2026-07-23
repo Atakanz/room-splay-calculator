@@ -843,7 +843,8 @@ export default function Calculator() {
                                                     <td className="p-2 text-center" onClick={(e) => e.stopPropagation()}>
                                                         <button
                                                             onClick={() => run3DSolver(r.physicalGeometry)}
-                                                            className="flex items-center gap-1 mx-auto px-2 py-1 bg-cyan-600 hover:bg-cyan-700 text-white rounded text-[11px] font-bold tracking-wide transition shadow-3xs cursor-pointer"
+                                                            disabled={is3DLoading}
+                                                            className="flex items-center gap-1 mx-auto px-2 py-1 bg-cyan-600 hover:bg-cyan-700 text-white rounded text-[11px] font-bold tracking-wide transition shadow-3xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                                                         >
                                                             <MdPlayArrow size={12} /> Run 3D
                                                         </button>
@@ -974,7 +975,8 @@ export default function Calculator() {
                                     {strategyMode === 'controlled' && (
                                         <button
                                             onClick={handleCalculate3D}
-                                            className="px-3 py-2 rounded bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold shadow-3xs transition-colors cursor-pointer"
+                                            disabled={!isInputComplete || is3DLoading}
+                                            className="px-3 py-2 rounded bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold shadow-3xs transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                                         >
                                             CALCULATE MODES (3D)
                                         </button>

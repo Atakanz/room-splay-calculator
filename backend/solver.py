@@ -33,7 +33,7 @@ def mass_form(u, v, w):
 def generate_optimized_mesh(length, height, w_min, w_max):
     h_x = 0.3
     h_y = 0.3
-    h_z = 0.4
+    h_z = 0.3
 
     nx = max(3, int(np.ceil(length / h_x)))
     ny = max(3, int(np.ceil(w_max / h_y)))
@@ -52,8 +52,10 @@ def generate_optimized_mesh(length, height, w_min, w_max):
     p = mesh.p.copy()
     x = p[0] * length
     z = p[2] * height
+
     w_x = w_min + (w_max - w_min) * p[0]
-    y = p[1] * w_x
+    offset = (w_max - w_x) / 2.0
+    y = offset + p[1] * w_x
 
     transformed_points = np.vstack([x, y, z])
     return MeshTet(transformed_points, mesh.t)
@@ -88,8 +90,8 @@ def calculate_3d_modes(lengthMean, currentHeight, wMin, wMax):
             return []
 
         # k_modes sayısını matris boyutunu aşmayacak şekilde güvenli limite çek
-        k_modes = min(30, max(2, num_dofs - 3)) 
-        sigma = 0.01
+        k_modes = min(101, max(2, num_dofs - 3)) 
+        sigma = -0.01
 
         eigenvalues = None
         if CHOLMOD_AVAILABLE:

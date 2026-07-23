@@ -1,4 +1,6 @@
-const API_BASE_URL = 'https://icsvwebsite-534923853316.europe-west1.run.app/api';
+const API_BASE_URL = 'http://localhost:8080/api';
+// http://localhost:8080/api
+// https://icsvwebsite-534923853316.europe-west1.run.app/api
 
 export const calculateReal3DModes = async (lengthMean, currentHeight, wMin, wMax) => {
     try {
