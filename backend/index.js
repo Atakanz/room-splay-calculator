@@ -17,7 +17,12 @@ const processNext = () => {
     const { req, res } = queue.shift();
     const { lengthMean, currentHeight, wMin, wMax } = req.body;
 
-    const pythonProcess = spawn('python3', [
+    // Production (Docker) ortamında sanal ortam Python'ını kullan
+    const pythonExecutable = process.env.NODE_ENV === 'production'
+        ? '/venv/bin/python3'
+        : 'python3';
+
+    const pythonProcess = spawn(pythonExecutable, [
         'solver.py',
         lengthMean,
         currentHeight,
@@ -25,7 +30,7 @@ const processNext = () => {
         wMax
     ]);
 
-    // Kullanıcı iptal ederse süreci öldür
+    // Kullanıcı tarayıcıyı/isteği kapatırsa Python sürecini sonlandır
     req.on('close', () => {
         if (!res.writableEnded) {
             pythonProcess.kill('SIGKILL');
@@ -45,14 +50,13 @@ const processNext = () => {
                 res.status(500).json({ error: "Hesaplama hatası", details: pythonData });
             }
         }
-        // Analiz bitti, bir sonraki isteği kuyruktan çek
+        // Analiz bitti, kuyruktaki bir sonraki isteğe geç
         isProcessing = false;
         processNext();
     });
 };
 
 app.post('/api/calculate-modes', (req, res) => {
-    // Gelen her isteği kuyruğa at ve işlemeyi tetikle
     queue.push({ req, res });
     processNext();
 });
