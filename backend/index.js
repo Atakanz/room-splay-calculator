@@ -77,7 +77,7 @@ const processNext = () => {
     });
 };
 
-// Health check endpoint (Cloud Run başlangıç kontrolü için kritik)
+// Health Check Endpoint (Cloud Run için hayati)
 app.get('/', (req, res) => {
     res.status(200).send('Backend sorunsuz çalışıyor!');
 });
@@ -87,7 +87,7 @@ app.post('/api/calculate-modes', (req, res) => {
     processNext();
 });
 
-// Port tanımını 0.0.0.0 host'u ile dinleyerek açıyoruz
+// Port dinlemeyi 0.0.0.0 IP'si ile kesinleştiriyoruz
 const PORT = parseInt(process.env.PORT, 10) || 8080;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server listening on port ${PORT}`);
