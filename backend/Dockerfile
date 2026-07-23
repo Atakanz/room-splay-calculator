@@ -1,6 +1,6 @@
 FROM node:20-slim
 
-# C++ ve CHOLMOD kütüphaneleri
+# C++, Fortran ve CHOLMOD kütüphaneleri
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y \
     libblas-dev \
     liblapack-dev \
     build-essential \
+    gfortran \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
