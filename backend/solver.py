@@ -8,8 +8,6 @@ import json
 import numpy as np
 from scipy.sparse.linalg import eigsh
 from skfem import MeshTet, ElementTetP2, InteriorBasis, BilinearForm, asm
-
-# CHOLMOD integration with fallback
 from scipy.sparse.linalg import LinearOperator
 
 try:
@@ -18,9 +16,7 @@ try:
 except Exception:
     CHOLMOD_AVAILABLE = False
 
-
 C = 343.0  # Ses hizi (m/s)
-
 
 @BilinearForm
 def stiffness_form(u, v, w):
@@ -28,14 +24,11 @@ def stiffness_form(u, v, w):
             u.grad[1] * v.grad[1] +
             u.grad[2] * v.grad[2])
 
-
 @BilinearForm
 def mass_form(u, v, w):
     return u * v
 
-
 def generate_optimized_mesh(length, height, w_min, w_max):
-    # P2 ELEMAN ICIN MESH BOYUTUNU GENISLETIYORUZ (DOF Patlamasini Onler)
     h_x = 0.3
     h_y = 0.3
     h_z = 0.4
@@ -44,7 +37,6 @@ def generate_optimized_mesh(length, height, w_min, w_max):
     ny = max(3, int(np.ceil(w_max / h_y)))
     nz = max(2, int(np.ceil(height / h_z)))
 
-    # Gerçek eleman boyutları hedef mesh boyutuna mümkün olduğunca yakın tutulur.
     dx = length / nx
     dy = w_max / ny
     dz = height / nz
@@ -64,50 +56,22 @@ def generate_optimized_mesh(length, height, w_min, w_max):
     transformed_points = np.vstack([x, y, z])
     return MeshTet(transformed_points, mesh.t)
 
-
-
-
-def _solve_with_cholmod(K, M, k_modes, sigma):
-    """CHOLMOD Shift-Invert solver."""
-    A = (K - sigma * M).tocsc()
-    factor = cholesky(A)
-
-    OPinv = LinearOperator(
-        shape=A.shape,
-        matvec=factor,
-        dtype=A.dtype,
-    )
-
-    eigenvalues, _ = eigsh(
-        K,
-        M=M,
-        k=k_modes,
-        sigma=sigma,
-        which="LM",
-        OPinv=OPinv,
-        tol=1e-3,
-        maxiter=1000,
-    )
-    return eigenvalues
-
 def _solve_with_superlu(K, M, k_modes, sigma):
-    """SciPy eigsh (ARPACK) + SuperLU Shift-Invert solver."""
+    """SciPy eigsh (ARPACK) + Fallback Shift-Invert solver."""
     eigenvalues, _ = eigsh(
         K, M=M,
         k=k_modes,
         sigma=sigma,
         which='LM',
         tol=1e-3,
-        maxiter=1000
+        maxiter=2000
     )
     return eigenvalues
-
 
 def calculate_3d_modes(lengthMean, currentHeight, wMin, wMax):
     try:
         mesh = generate_optimized_mesh(lengthMean, currentHeight, wMin, wMax)
 
-        # ANSYS HASSASIYETI ICIN QUADRATIC ELEMAN
         element = ElementTetP2()
         basis = InteriorBasis(mesh, element)
 
@@ -118,12 +82,17 @@ def calculate_3d_modes(lengthMean, currentHeight, wMin, wMax):
         if num_dofs <= 3:
             return []
 
-        k_modes = min(51, num_dofs - 2) 
+        # k_modes sayısını matris boyutunu aşmayacak şekilde güvenli limite çek
+        k_modes = min(30, max(2, num_dofs - 3)) 
         sigma = 0.01
 
+        eigenvalues = None
         if CHOLMOD_AVAILABLE:
             try:
-                eigenvalues = _solve_with_cholmod(K, M, k_modes, sigma)
+                A = (K - sigma * M).tocsc()
+                factor = cholesky(A)
+                OPinv = LinearOperator(shape=A.shape, matvec=factor, dtype=A.dtype)
+                eigenvalues, _ = eigsh(K, M=M, k=k_modes, sigma=sigma, which="LM", OPinv=OPinv, tol=1e-3, maxiter=1000)
             except Exception:
                 eigenvalues = _solve_with_superlu(K, M, k_modes, sigma)
         else:
@@ -132,7 +101,7 @@ def calculate_3d_modes(lengthMean, currentHeight, wMin, wMax):
         frequencies = []
         for val in eigenvalues:
             real_val = float(val)
-            if real_val > 0.05:  # 0 Hz rigid DC mod elenir
+            if real_val > 0.05:
                 k_val = np.sqrt(real_val)
                 freq = (k_val * C) / (2 * np.pi)
                 frequencies.append(round(freq, 2))
@@ -142,7 +111,7 @@ def calculate_3d_modes(lengthMean, currentHeight, wMin, wMax):
 
     except Exception as e:
         print(f"FEM Error: {str(e)}", file=sys.stderr)
-        return []
+        raise e
 
 
 if __name__ == "__main__":
@@ -161,7 +130,6 @@ if __name__ == "__main__":
         sys.stdout.flush()
 
     except Exception as e:
-        # Hata olsa dahi stdout'a temiz JSON yaz ki Node.js parse ederken 500 vermesin
         print(json.dumps({"frequencies": [], "error": str(e)}))
         sys.stdout.flush()
         sys.exit(0)
