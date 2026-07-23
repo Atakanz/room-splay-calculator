@@ -14,7 +14,8 @@ from scipy.sparse.linalg import LinearOperator
 try:
     from sksparse.cholmod import cholesky
     CHOLMOD_AVAILABLE = True
-except Exception:
+except Exception as e:
+    print(f"CHOLMOD IMPORT ERROR: {e}", file=sys.stderr)
     CHOLMOD_AVAILABLE = False
 
 C = 343.0  # Ses hizi (m/s)
