@@ -4,13 +4,13 @@ const { spawn } = require('child_process');
 const fs = require('fs');
 const app = express();
 
+// CORS Middleware
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-app.options('*', cors());
 app.use(express.json());
 
 const queue = [];
@@ -77,7 +77,6 @@ const processNext = () => {
     });
 };
 
-// Health Check Endpoint (Cloud Run için hayati)
 app.get('/', (req, res) => {
     res.status(200).send('Backend sorunsuz çalışıyor!');
 });
@@ -87,7 +86,6 @@ app.post('/api/calculate-modes', (req, res) => {
     processNext();
 });
 
-// Port dinlemeyi 0.0.0.0 IP'si ile kesinleştiriyoruz
 const PORT = parseInt(process.env.PORT, 10) || 8080;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server listening on port ${PORT}`);
