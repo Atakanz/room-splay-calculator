@@ -1,4 +1,4 @@
-numpy
+numpy==2.0.2
 scipy
 scikit-fem
-scikit-sparse==0.4.12
+scikit-sparse==0.4.16
