@@ -34,11 +34,7 @@ const processNext = () => {
         String(wMax || 0)
     ]);
 
-    req.on('close', () => {
-        if (!res.writableEnded) {
-            pythonProcess.kill('SIGKILL');
-        }
-    });
+
 
     let pythonData = "";
     let pythonError = "";
@@ -52,19 +48,41 @@ const processNext = () => {
     });
 
     pythonProcess.on('close', (code) => {
+
+        console.log("Exit code:", code);
+
+        console.log("STDOUT:", pythonData);
+
+        console.log("STDERR:", pythonError);
+
+        isProcessing = false;
+        processNext();
+
         if (!res.writableEnded) {
+
             if (code !== 0) {
+
                 console.error("Python Execution Error:", pythonError);
+
                 return res.status(500).json({
+
                     error: "Python hesaplama hatası oluştu",
+
                     details: pythonError || pythonData
+
                 });
+
             }
 
             try {
-                const parsed = JSON.parse(pythonData);
-                return res.json(parsed);
+                const parsed = JSON.parse(pythonData.trim());
+                console.log("Parsed:", parsed);
+                console.log("Sending response...");
+                res.json(parsed);
+                console.log("Response sent.");
+                return;
             } catch (error) {
+                console.error(error);
                 console.error("JSON Parse Error. Raw Output:", pythonData);
                 return res.status(500).json({
                     error: "Çıktı JSON formatında değil",
@@ -72,8 +90,6 @@ const processNext = () => {
                 });
             }
         }
-        isProcessing = false;
-        processNext();
     });
 };
 

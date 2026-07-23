@@ -31,7 +31,7 @@ def mass_form(u, v, w):
 def generate_optimized_mesh(length, height, w_min, w_max):
     h_x = 0.3
     h_y = 0.3
-    h_z = 0.4
+    h_z = 0.3
 
     nx = max(3, int(np.ceil(length / h_x)))
     ny = max(3, int(np.ceil(w_max / h_y)))
@@ -128,6 +128,9 @@ if __name__ == "__main__":
 
         print(json.dumps({"frequencies": freq_list}))
         sys.stdout.flush()
+
+        print(f"CHOLMOD: {CHOLMOD_AVAILABLE}", file=sys.stderr)
+        sys.stderr.flush()
 
     except Exception as e:
         print(json.dumps({"frequencies": [], "error": str(e)}))
