@@ -5,6 +5,7 @@ os.environ.setdefault("MKL_NUM_THREADS", "4")
 
 import sys
 import json
+import time
 import numpy as np
 from scipy.sparse.linalg import eigsh
 from skfem import MeshTet, ElementTetP2, InteriorBasis, BilinearForm, asm
@@ -79,6 +80,9 @@ def calculate_3d_modes(lengthMean, currentHeight, wMin, wMax):
         M = asm(mass_form, basis).tocsc()
 
         num_dofs = K.shape[0]
+        print(f"DOFs: {num_dofs}", file=sys.stderr)
+        print(f"Elements: {mesh.t.shape[1]}", file=sys.stderr)
+
         if num_dofs <= 3:
             return []
 
@@ -89,14 +93,35 @@ def calculate_3d_modes(lengthMean, currentHeight, wMin, wMax):
         eigenvalues = None
         if CHOLMOD_AVAILABLE:
             try:
+                print(">>> USING CHOLMOD <<<", file=sys.stderr)
                 A = (K - sigma * M).tocsc()
                 factor = cholesky(A)
                 OPinv = LinearOperator(shape=A.shape, matvec=factor, dtype=A.dtype)
-                eigenvalues, _ = eigsh(K, M=M, k=k_modes, sigma=sigma, which="LM", OPinv=OPinv, tol=1e-3, maxiter=1000)
-            except Exception:
+
+                t0 = time.perf_counter()
+                eigenvalues, _ = eigsh(
+                    K,
+                    M=M,
+                    k=k_modes,
+                    sigma=sigma,
+                    which="LM",
+                    OPinv=OPinv,
+                    tol=1e-3,
+                    maxiter=1000
+                )
+                print(f"EIGSH TIME: {time.perf_counter() - t0:.2f} s", file=sys.stderr)
+                print(">>> CHOLMOD SUCCESS <<<", file=sys.stderr)
+
+            except Exception as e:
+                print(f">>> CHOLMOD FAILED: {e} <<<", file=sys.stderr)
+                t0 = time.perf_counter()
                 eigenvalues = _solve_with_superlu(K, M, k_modes, sigma)
+                print(f"SUPERLU TIME: {time.perf_counter() - t0:.2f} s", file=sys.stderr)
         else:
+            print(">>> USING SUPERLU <<<", file=sys.stderr)
+            t0 = time.perf_counter()
             eigenvalues = _solve_with_superlu(K, M, k_modes, sigma)
+            print(f"SUPERLU TIME: {time.perf_counter() - t0:.2f} s", file=sys.stderr)
 
         frequencies = []
         for val in eigenvalues:
@@ -107,7 +132,7 @@ def calculate_3d_modes(lengthMean, currentHeight, wMin, wMax):
                 frequencies.append(round(freq, 2))
 
         frequencies.sort()
-        return frequencies[:50]
+        return frequencies[:100]
 
     except Exception as e:
         print(f"FEM Error: {str(e)}", file=sys.stderr)
