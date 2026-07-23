@@ -1,17 +1,5 @@
-/**
- * Real 3D Acoustic FDM Solver Service
- * Python tabanlı non-rectangular 3D çözücü ile haberleşir.
- */
-
 const API_BASE_URL = 'https://icsvwebsite-534923853316.europe-west1.run.app/api';
 
-/**
- * @param {number} lengthMean - Odanın ortalama uzunluğu
- * @param {number} heightMean - Odanın yüksekliği
- * @param {number} wMin - Trapez tabanın kısa genişlik kenarı (Width Front veya Rear)
- * @param {number} wMax - Trapez tabanın uzun genişlik kenarı (Width Rear veya Front)
- * @returns {Promise<{frequencies: number[]}>}
- */
 export const calculateReal3DModes = async (lengthMean, currentHeight, wMin, wMax) => {
     try {
         const response = await fetch(`${API_BASE_URL}/calculate-modes`, {
@@ -28,10 +16,11 @@ export const calculateReal3DModes = async (lengthMean, currentHeight, wMin, wMax
         });
 
         if (!response.ok) {
-            throw new Error(`API Hatası: ${response.statusText}`);
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.details || errData.error || `Server Hatası: ${response.status}`);
         }
 
-        const data = await response.ok ? await response.json() : { frequencies: [] };
+        const data = await response.json();
         return data;
     } catch (error) {
         console.error("Real 3D solver servis bağlantı hatası:", error);

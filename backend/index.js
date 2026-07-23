@@ -1,16 +1,18 @@
 const express = require('express');
 const cors = require('cors');
 const { spawn } = require('child_process');
+const fs = require('fs');
 const app = express();
 
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
+app.options('*', cors());
 app.use(express.json());
-// Kuyruk Mekanizması
+
 const queue = [];
 let isProcessing = false;
 
@@ -19,22 +21,21 @@ const processNext = () => {
 
     isProcessing = true;
     const { req, res } = queue.shift();
-    const { lengthMean, currentHeight, wMin, wMax } = req.body;
+    const { lengthMean, currentHeight, wMin, wMax } = req.body || {};
 
-    // Production (Docker) ortamında sanal ortam Python'ını kullan
-    const pythonExecutable = process.env.NODE_ENV === 'production'
-        ? '/venv/bin/python3'
-        : 'python3';
+    // Docker veya Venv Python konumu
+    const venvPython = '/venv/bin/python3';
+    const pythonExecutable = fs.existsSync(venvPython) ? venvPython : 'python3';
 
+    // Parametreleri kesin olarak String'e çevirerek gönder
     const pythonProcess = spawn(pythonExecutable, [
         'solver.py',
-        lengthMean,
-        currentHeight,
-        wMin,
-        wMax
+        String(lengthMean || 0),
+        String(currentHeight || 0),
+        String(wMin || 0),
+        String(wMax || 0)
     ]);
 
-    // Kullanıcı tarayıcıyı/isteği kapatırsa Python sürecini sonlandır
     req.on('close', () => {
         if (!res.writableEnded) {
             pythonProcess.kill('SIGKILL');
@@ -42,23 +43,45 @@ const processNext = () => {
     });
 
     let pythonData = "";
+    let pythonError = "";
+
     pythonProcess.stdout.on('data', (data) => {
         pythonData += data.toString();
     });
 
-    pythonProcess.on('close', () => {
+    pythonProcess.stderr.on('data', (data) => {
+        pythonError += data.toString();
+    });
+
+    pythonProcess.on('close', (code) => {
         if (!res.writableEnded) {
+            if (code !== 0) {
+                console.error("Python Execution Error:", pythonError);
+                return res.status(500).json({
+                    error: "Python hesaplama hatası oluştu",
+                    details: pythonError || pythonData
+                });
+            }
+
             try {
-                res.json(JSON.parse(pythonData));
+                const parsed = JSON.parse(pythonData);
+                return res.json(parsed);
             } catch (error) {
-                res.status(500).json({ error: "Hesaplama hatası", details: pythonData });
+                console.error("JSON Parse Error. Raw Output:", pythonData);
+                return res.status(500).json({
+                    error: "Çıktı JSON formatında değil",
+                    details: pythonData
+                });
             }
         }
-        // Analiz bitti, kuyruktaki bir sonraki isteğe geç
         isProcessing = false;
         processNext();
     });
 };
+
+app.get('/', (req, res) => {
+    res.send('Backend sorunsuz çalışıyor!');
+});
 
 app.post('/api/calculate-modes', (req, res) => {
     queue.push({ req, res });

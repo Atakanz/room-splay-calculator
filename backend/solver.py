@@ -147,6 +147,9 @@ def calculate_3d_modes(lengthMean, currentHeight, wMin, wMax):
 
 if __name__ == "__main__":
     try:
+        if len(sys.argv) < 5:
+            raise ValueError("Eksik parametre gönderildi.")
+
         lengthMean = float(sys.argv[1])
         currentHeight = float(sys.argv[2])
         wMin = float(sys.argv[3])
@@ -158,5 +161,7 @@ if __name__ == "__main__":
         sys.stdout.flush()
 
     except Exception as e:
+        # Hata olsa dahi stdout'a temiz JSON yaz ki Node.js parse ederken 500 vermesin
         print(json.dumps({"frequencies": [], "error": str(e)}))
         sys.stdout.flush()
+        sys.exit(0)
