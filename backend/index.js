@@ -23,11 +23,9 @@ const processNext = () => {
     const { req, res } = queue.shift();
     const { lengthMean, currentHeight, wMin, wMax } = req.body || {};
 
-    // Docker veya Venv Python konumu
     const venvPython = '/venv/bin/python3';
     const pythonExecutable = fs.existsSync(venvPython) ? venvPython : 'python3';
 
-    // Parametreleri kesin olarak String'e çevirerek gönder
     const pythonProcess = spawn(pythonExecutable, [
         'solver.py',
         String(lengthMean || 0),
@@ -79,8 +77,9 @@ const processNext = () => {
     });
 };
 
+// Health check endpoint (Cloud Run başlangıç kontrolü için kritik)
 app.get('/', (req, res) => {
-    res.send('Backend sorunsuz çalışıyor!');
+    res.status(200).send('Backend sorunsuz çalışıyor!');
 });
 
 app.post('/api/calculate-modes', (req, res) => {
@@ -88,5 +87,8 @@ app.post('/api/calculate-modes', (req, res) => {
     processNext();
 });
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`Backend ${PORT} portunda çalışıyor.`));
+// Port tanımını 0.0.0.0 host'u ile dinleyerek açıyoruz
+const PORT = parseInt(process.env.PORT, 10) || 8080;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server listening on port ${PORT}`);
+});
