@@ -3,7 +3,7 @@
  * Python tabanlı non-rectangular 3D çözücü ile haberleşir.
  */
 
-const API_BASE_URL = 'https://icsvwebsite-534923853316.europe-west1.run.app';
+const API_BASE_URL = 'https://icsvwebsite-534923853316.europe-west1.run.app/api';
 
 /**
  * @param {number} lengthMean - Odanın ortalama uzunluğu
