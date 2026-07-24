@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = 'https://icsvwebsite-534923853316.europe-west1.run.app/api';
 // http://localhost:8080/api
 // https://icsvwebsite-534923853316.europe-west1.run.app/api
 
