@@ -596,7 +596,7 @@ export default function Calculator() {
                             <div className="pt-1 px-1 animate-fade-in">
                                 <input
                                     type="range"
-                                    min={strategyMode === 'controlled' ? controlledEffectiveMinH : 0.5}
+                                    min={strategyMode === 'controlled' ? controlledEffectiveMinH : 2}
                                     max={strategyMode === 'controlled' ? controlledEffectiveMinH + 3 : 6.0}
                                     step="0.01"
                                     value={strategyMode === 'controlled' ? (controlledHeight || controlledEffectiveMinH) : (inputs.height || 2.5)}
@@ -611,7 +611,7 @@ export default function Calculator() {
                                     className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-slate-200 focus:outline-none accent-indigo-600`}
                                 />
                                 <div className="flex justify-between text-[10px] text-slate-400 font-mono mt-0.5">
-                                    <span>Min: {strategyMode === 'controlled' ? controlledEffectiveMinH : 0.5}m</span>
+                                    <span>Min: {strategyMode === 'controlled' ? controlledEffectiveMinH : 2}m</span>
                                     <span>Max: {strategyMode === 'controlled' ? (controlledEffectiveMinH + 3).toFixed(2) : 6.0}m</span>
                                 </div>
                             </div>
