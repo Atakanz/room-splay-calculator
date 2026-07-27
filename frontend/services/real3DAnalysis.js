@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = 'https://icsvwebsite-534923853316.europe-west1.run.app/api';
 // http://localhost:8080/api
 // https://icsvwebsite-534923853316.europe-west1.run.app/api
 let currentController = null;
@@ -7,6 +7,7 @@ export const calculateReal3DModes = async (lengthMean, currentHeight, wMin, wMax
     try {
         const response = await fetch(`${API_BASE_URL}/calculate-modes`, {
             method: 'POST',
+            signal: currentController.signal,
             headers: {
                 'Content-Type': 'application/json',
             },
