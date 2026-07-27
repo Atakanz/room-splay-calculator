@@ -10,7 +10,6 @@ import numpy as np
 from scipy.sparse.linalg import eigsh
 from skfem import MeshTet, ElementTetP2, InteriorBasis, BilinearForm, asm
 from scipy.sparse.linalg import LinearOperator
-
 try:
     from sksparse.cholmod import cholesky
     CHOLMOD_AVAILABLE = True
@@ -18,7 +17,7 @@ except Exception as e:
     print(f"CHOLMOD IMPORT ERROR: {e}", file=sys.stderr)
     CHOLMOD_AVAILABLE = False
 
-C = 343.0  # Ses hizi (m/s)
+C = 343.0
 
 @BilinearForm
 def stiffness_form(u, v, w):
