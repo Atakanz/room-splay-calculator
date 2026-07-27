@@ -1,8 +1,9 @@
-const API_BASE_URL = 'https://icsvwebsite-534923853316.europe-west1.run.app/api';
+const API_BASE_URL = 'http://localhost:8080/api';
 // http://localhost:8080/api
 // https://icsvwebsite-534923853316.europe-west1.run.app/api
-
+let currentController = null;
 export const calculateReal3DModes = async (lengthMean, currentHeight, wMin, wMax) => {
+    currentController = new AbortController();
     try {
         const response = await fetch(`${API_BASE_URL}/calculate-modes`, {
             method: 'POST',
@@ -28,4 +29,16 @@ export const calculateReal3DModes = async (lengthMean, currentHeight, wMin, wMax
         console.error("Real 3D solver servis bağlantı hatası:", error);
         return { frequencies: [], error: error.message };
     }
+};
+
+export const cancelReal3DCalculation = () => {
+
+    if (currentController) {
+
+        currentController.abort();
+
+        currentController = null;
+
+    }
+
 };

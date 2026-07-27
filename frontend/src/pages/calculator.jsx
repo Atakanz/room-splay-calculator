@@ -20,6 +20,7 @@ export default function Calculator() {
     const [real3DModes, setReal3DModes] = useState([]);
     const [is3DLoading, setIs3DLoading] = useState(false);
     const [last3DAnalysis, setLast3DAnalysis] = useState(null);
+    const [runningAngle, setRunningAngle] = useState(null);
 
     const [saved3DRuns, setSaved3DRuns] = useState([]);
 
@@ -154,6 +155,8 @@ export default function Calculator() {
     };
 
     const run3DSolver = async (geomData) => {
+        setRunningAngle(geomData.angle_deg);
+        setIs3DLoading(true);
         setIs3DLoading(true);
         const wMin = Math.min(geomData.width.front, geomData.width.rear);
         const wMax = Math.max(geomData.width.front, geomData.width.rear);
@@ -177,6 +180,8 @@ export default function Calculator() {
                 fsi: calculatedFemFsi
             });
         }
+        setIs3DLoading(false);
+        setRunningAngle(null);
         setIs3DLoading(false);
     };
 
@@ -265,6 +270,12 @@ export default function Calculator() {
         } else {
             setInputs({ ...inputs, [name]: val });
         }
+    };
+
+    const handleStop3D = () => {
+        real3DAnalysis.cancelReal3DCalculation();
+        setRunningAngle(null);
+        setIs3DLoading(false);
     };
 
     const stepInput = (name, direction, stepValue) => {
@@ -841,13 +852,23 @@ export default function Calculator() {
                                                         {!r.warning && r.targetArea >= 20 && r.targetArea <= 60 && <span className="text-emerald-600 font-medium text-xs">✅</span>}
                                                     </td>
                                                     <td className="p-2 text-center" onClick={(e) => e.stopPropagation()}>
-                                                        <button
-                                                            onClick={() => run3DSolver(r.physicalGeometry)}
-                                                            disabled={is3DLoading}
-                                                            className="flex items-center gap-1 mx-auto px-2 py-1 bg-cyan-600 hover:bg-cyan-700 text-white rounded text-[11px] font-bold tracking-wide transition shadow-3xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                                                        >
-                                                            <MdPlayArrow size={12} /> Run 3D
-                                                        </button>
+                                                        {runningAngle === r.angle ? (
+                                                            <button
+                                                                onClick={handleStop3D}
+                                                                className="px-3 py-1 rounded bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold transition-colors cursor-pointer"
+                                                            >
+                                                                STOP
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => run3DSolver(r.physicalGeometry)}
+                                                                disabled={is3DLoading}
+                                                                className="px-3 py-1 rounded bg-cyan-600 hover:bg-cyan-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                                                            >
+                                                                <MdPlayArrow size={12} />
+                                                                Run 3D
+                                                            </button>
+                                                        )}
                                                     </td>
                                                 </tr>
                                             ))}
@@ -974,13 +995,37 @@ export default function Calculator() {
                             <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                                 <div className="flex flex-wrap gap-2 mb-2">
                                     {strategyMode === 'controlled' && (
-                                        <button
-                                            onClick={handleCalculate3D}
-                                            disabled={!isInputComplete || is3DLoading}
-                                            className="px-3 py-2 rounded bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold shadow-3xs transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                                        >
-                                            CALCULATE MODES (3D)
-                                        </button>
+
+                                        is3DLoading ? (
+
+                                            <button
+
+                                                onClick={handleStop3D}
+
+                                                className="px-3 py-2 rounded bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-colors"
+
+                                            >
+
+                                                STOP
+
+                                            </button>
+
+                                        ) : (
+
+                                            <button
+
+                                                onClick={handleCalculate3D}
+
+                                                className="px-3 py-2 rounded bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold transition-colors"
+
+                                            >
+
+                                                CALCULATE MODES
+
+                                            </button>
+
+                                        )
+
                                     )}
                                     <button
                                         onClick={handleCopy3DTable}
