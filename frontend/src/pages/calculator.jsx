@@ -11,6 +11,7 @@ import RoomComplianceChart from '../components/RoomComplianceChart.jsx';
 import * as real3DAnalysis from '../../services/real3DAnalysis.js';
 import SavedRow from '../components/SavedRow.jsx';
 import { exportSavedRunsToExcel } from '../../services/exportAsExcel.js';
+import ControlledRoomVisualizer from '../components/ControlledRoomVisualizer.jsx';
 
 export default function Calculator() {
     const [strategyMode, setStrategyMode] = useState('optimum');
@@ -953,6 +954,7 @@ export default function Calculator() {
                                     <p className="text-base md:text-sm font-semibold">{result.angle_deg}°</p>
                                 </div>
                             </div>
+                            <ControlledRoomVisualizer result={result} />
                         </div>
                     )}
 

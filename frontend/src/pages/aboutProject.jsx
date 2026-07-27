@@ -2,10 +2,7 @@ import {
     BookOpen,
     Layers,
     Cpu,
-    CheckCircle2,
-    Clock,
     FileText,
-    ArrowRight
 } from 'lucide-react';
 
 export default function AboutProject() {

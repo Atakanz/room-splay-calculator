@@ -36,8 +36,9 @@ export default function ControlledRoomVisualizer({ result }) {
     if (!result) return null;
 
     // --- Geometri ve SVG Hesaplamaları (Geri kalan her şey aynı) ---
-    const svgWidth = 500;
-    const svgHeight = 400;
+    const svgSize = 500;
+    const svgWidth = svgSize;
+    const svgHeight = svgSize;
     const padding = 60;
     const maxRealDim = Math.max(wRear, lengthBase);
     const scale = (Math.min(svgWidth, svgHeight) - padding * 2) / maxRealDim;
@@ -59,8 +60,14 @@ export default function ControlledRoomVisualizer({ result }) {
     return (
         <div className="p-6 bg-slate-950 border border-slate-800 rounded-xl flex flex-col items-center justify-center">
             {/* SVG ve alt kartlar buraya gelecek (Önceki JSX yapınızın aynısı) */}
-            <div className="relative w-full max-w-[500px] aspect-[5/4] bg-slate-900/30 rounded-lg border border-slate-800/80 overflow-hidden flex items-center justify-center">
-                <svg width="100%" height="100%" viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="font-mono text-[11px] fill-slate-400">
+            <div className="relative w-full max-w-[420px] aspect-square bg-slate-900/30 rounded-lg border border-slate-800/80 overflow-hidden flex items-center justify-center">
+                <svg
+                    width="82%"
+                    height="82%"
+                    viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+                    preserveAspectRatio="xMidYMid meet"
+                    className="font-mono text-[11px] fill-slate-400"
+                >
                     <defs>
                         <pattern id="visualizer-grid" width="20" height="20" patternUnits="userSpaceOnUse">
                             <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(51, 65, 85, 0.2)" strokeWidth="1" />
