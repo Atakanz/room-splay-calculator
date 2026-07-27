@@ -360,9 +360,8 @@ export default function Calculator() {
             }
 
             const enhancedRes = origRes.map(row => {
-                const parts = row.message.split(':');
-                const targetW = safeHeight * parseFloat(parts[1]);
-                const targetL = safeHeight * parseFloat(parts[2]);
+                const targetW = row.avgWidth;
+                const targetL = row.avgLength;
                 const targetArea = targetW * targetL;
 
                 const targetModesResult = modalAnalysis.calculateAllModes(targetW, targetL, safeHeight);

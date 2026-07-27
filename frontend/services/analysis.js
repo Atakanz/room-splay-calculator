@@ -41,7 +41,15 @@ export function splayTheRoom(w, l, h, angle_deg) {
     const is_ok = checkRatio(w_ratio, l_ratio);
 
     if (is_ok) {
-        return { status: true, is_under_4m, message: `1:${w_ratio.toFixed(2)}:${l_ratio.toFixed(2)}` };
+        return {
+            status: true,
+            is_under_4m,
+            message: `1:${w_ratio.toFixed(2)}:${l_ratio.toFixed(2)}`,
+            avgWidth: avg_w,
+            avgLength: new_length,
+            w_ratio,
+            l_ratio
+        };
     } else {
         return { status: false, is_under_4m, message: "RATIO_ERROR" };
     }
@@ -50,9 +58,9 @@ export function splayTheRoom(w, l, h, angle_deg) {
 export function calculateTheOptimumRatio(w, l, h) {
     const results = [];
     for (let angle = 0; angle < 15; angle++) {
-        const { status, is_under_4m, message } = splayTheRoom(w, l, h, angle);
+        const { status, is_under_4m, message, avgWidth, avgLength, w_ratio, l_ratio } = splayTheRoom(w, l, h, angle);
         if (status) {
-            results.push({ angle, message, warning: is_under_4m });
+            results.push({ angle, message, warning: is_under_4m, avgWidth, avgLength, w_ratio, l_ratio });
         }
     }
     return results;
