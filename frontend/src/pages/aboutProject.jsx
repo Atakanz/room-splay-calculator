@@ -1,144 +1,119 @@
 import {
     BookOpen,
-    Settings2,
-    Activity,
-    AlertCircle,
-    Maximize,
+    Layers,
+    Cpu,
+    CheckCircle2,
+    Clock,
     FileText,
-    LocateFixed
+    ArrowRight
 } from 'lucide-react';
 
 export default function AboutProject() {
     return (
         <div className="min-h-screen bg-slate-100 p-4 md:p-8 lg:p-12 font-sans text-slate-800">
-            <div className="max-w-5xl mx-auto bg-white border border-slate-300 shadow-sm">
+            <div className="max-w-4xl mx-auto bg-white border border-slate-300 shadow-sm rounded-sm">
 
                 {/* DOCUMENT HEADER */}
-                <header className="border-b-4 border-sky-600 bg-slate-50 p-8 md:p-12">
-                    <div className="flex items-center gap-2 text-sky-700 font-mono text-xs uppercase tracking-widest mb-4 font-bold">
+                <header className="border-b-4 border-sky-600 bg-slate-50 p-6 md:p-10">
+                    <div className="flex items-center gap-2 text-sky-700 font-mono text-xs uppercase tracking-widest mb-3 font-bold">
                         <FileText size={16} />
                         <span>ICSV32 Istanbul - International Congress on Sound and Vibration</span>
                     </div>
-                    <p className="text-xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
-                        A Geometric Framework for Controlled Wall Splaying In ITU-Compliant Listening Room Design
-                    </p>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-200">
+                    {/* NEW TITLE */}
+                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6 leading-tight">
+                        Computational Framework for Symmetric Double-Sided Wall Splaying in ITU-Compliant Listening Rooms
+                    </h1>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-200 text-sm">
                         <div>
-                            <p className="text-xs text-slate-500 uppercase tracking-widest font-mono mb-1">Researchers</p>
+                            <p className="text-xs text-slate-400 uppercase tracking-widest font-mono mb-1">Researchers</p>
                             <p className="font-semibold text-slate-800">Atakan Zerafet</p>
-                            <p className="text-sm text-slate-600">Art & Design, Dokuz Eylul University</p>
-                            <p className="font-semibold mt-1 text-slate-800">Suat Vergili, Feridun Öziş</p>
-                            <p className="text-sm text-slate-600">Music Technology, Dokuz Eylul University</p>
-                        </div>
-                        <div>
-
+                            <p className="text-xs text-slate-600">Art & Design, Dokuz Eylul University</p>
+                            <p className="font-semibold mt-2 text-slate-800">Suat Vergili, Feridun Öziş</p>
+                            <p className="text-xs text-slate-600">Music Technology, Dokuz Eylul University</p>
                         </div>
                     </div>
                 </header>
 
-                <div className="p-8 md:p-12 space-y-16">
+                <div className="p-6 md:p-10 space-y-10">
 
-                    {/* 1. THE SCIENTIFIC GAP */}
+                    {/* 1. RESEARCH MOTIVATION */}
                     <section>
-                        <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 border-b border-slate-200 pb-2 mb-4">
-                            <BookOpen className="text-sky-600" size={24} />
-                            1. The Standardization Gap
+                        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900 border-b border-slate-200 pb-2 mb-3">
+                            <BookOpen className="text-sky-600" size={20} />
+                            1. Research Motivation
                         </h2>
-                        <div className="text-slate-700 leading-relaxed space-y-4 text-justify">
+                        <div className="text-slate-700 text-sm leading-relaxed space-y-3">
                             <p>
-                                International acoustic standards, specifically ITU-R BS.1116-3, provide strict dimensional room ratios for critical listening environments and suggest the use of trapezoidal geometries. However, while the standard offers these ratios, it provides no mathematical formulas or established methodologies to implement them in non-parallel architectural footprints.
+                                ITU-R BS.1116 define dimensional recommendations for critical listening rooms and encourage the use of non-parallel walls. However, a computational framework for systematically transforming standardized rectangular room ratios into symmetric double-sided splayed geometries has not been established.
                             </p>
-                            <p className="bg-sky-50 border-l-4 border-sky-500 p-4 text-slate-800 italic text-sm text-justify">
-                                There is a distinct lack of quantitative design guidelines for trapezoidal models. This framework establishes a mathematical bridge, ensuring non-parallel wall geometries can be objectively evaluated against standardized rectangular criteria.
+                            <p className="bg-sky-50 border-l-4 border-sky-600 p-3 text-slate-800 text-xs font-medium leading-normal">
+                                This project presents a computational framework for generating symmetric double-sided splayed listening-room geometries while preserving the dimensional constraints defined by ITU-R BS.1116.
                             </p>
                         </div>
                     </section>
 
-                    {/* 2. SPLAYING METHODOLOGIES */}
+                    {/* 2. CURRENT SCOPE */}
                     <section>
-                        <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 border-b border-slate-200 pb-2 mb-6">
-                            <Settings2 className="text-sky-600" size={24} />
-                            2. Splaying Methodologies
+                        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900 border-b border-slate-200 pb-3 mb-3">
+                            <Layers className="text-sky-600" size={20} />
+                            2. Current Scope
                         </h2>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div className="border border-slate-200 p-6 bg-slate-50">
-                                <h3 className="font-mono font-bold text-sky-700 mb-3 text-sm uppercase tracking-wide">Inward Splaying</h3>
-                                <p className="text-sm text-slate-600 leading-relaxed mb-4 text-justify">
-                                    Usable for existing rooms. This methodology applies angled acoustic boundaries <em>inside</em> an established room to remediate periodic reflections.
-                                </p>
-                                <ul className="text-xs text-slate-500 space-y-2">
-                                    <li className="flex gap-2"><span className="text-sky-500">&bull;</span> Reduces effective volume dynamically.</li>
-                                    <li className="flex gap-2"><span className="text-sky-500">&bull;</span> Utilizes reverse-engineering to keep the minimized geometry within the ITU compliant zone.</li>
-                                </ul>
-                            </div>
-
-                            <div className="border border-slate-200 p-6 bg-slate-50">
-                                <h3 className="font-mono font-bold text-sky-700 mb-3 text-sm uppercase tracking-wide">Controlled Splaying</h3>
-                                <p className="text-sm text-slate-600 leading-relaxed mb-4 text-justify">
-                                    Implemented during the architectural stage. Geometry is generated outward based on target splay angles rather than shrinking an existing room.
-                                </p>
-                                <ul className="text-xs text-slate-500 space-y-2">
-                                    <li className="flex gap-2"><span className="text-sky-500">&bull;</span> Dynamically adjusts height and width parameters.</li>
-                                    <li className="flex gap-2"><span className="text-sky-500">&bull;</span> Locks the primary listener width boundary (4 m) to standardized values.</li>
-                                </ul>
-                            </div>
+                        <div className="bg-sky-900 text-white p-5 rounded-md shadow-inner">
+                            <h3 className="text-xs font-mono font-bold tracking-wider uppercase text-sky-300 mb-3">
+                                Current Implementation
+                            </h3>
+                            <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs font-medium">
+                                <li className="flex items-center gap-2">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-sky-400 shrink-0"></span>
+                                    Symmetric double-sided wall splaying
+                                </li>
+                                <li className="flex items-center gap-2">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-sky-400 shrink-0"></span>
+                                    ITU geometric transformation
+                                </li>
+                                <li className="flex items-center gap-2">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-sky-400 shrink-0"></span>
+                                    Rayleigh modal-frequency calculations
+                                </li>
+                                <li className="flex items-center gap-2">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-sky-400 shrink-0"></span>
+                                    Python-based finite element modelling
+                                </li>
+                                <li className="flex items-center gap-2 md:col-span-2">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-sky-400 shrink-0"></span>
+                                    Modal analysis using scikit-fem
+                                </li>
+                            </ul>
                         </div>
                     </section>
 
-                    {/* 3. THE ACOUSTIC ENGINE (CALCULATOR LOGIC) */}
+                    {/* 3. IMPLEMENTED METHODS */}
                     <section>
-                        <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 border-b border-slate-200 pb-2 mb-6">
-                            <Activity className="text-sky-600" size={24} />
-                            3. Functions
+                        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900 border-b border-slate-200 pb-2 mb-4">
+                            <Cpu className="text-sky-600" size={20} />
+                            3. Implemented Methods
                         </h2>
-                        <p className="text-slate-700 mb-6 text-sm text-justify">
-                            The project utilizes a custom React-based acoustic calculator. This engine continuously monitors physical inputs and processes modal responses in real-time, enforcing ITU-R limitations on asymmetric shapes.
-                        </p>
-
-                        <div className="grid md:grid-cols-2 gap-6 mt-6">
-                            {/* Feature 1 */}
-                            <div className="bg-slate-50 border border-slate-200 rounded-b-lg p-6 shadow-sm border-t-4 border-t-sky-500 flex flex-col">
-                                <h3 className="text-slate-900 font-bold text-sm mb-3 flex items-center gap-2">
-                                    <Activity size={18} className="text-sky-500 shrink-0" />
-                                    Modal Density
-                                </h3>
-                                <p className="text-sm text-slate-600 leading-relaxed text-justify">
-                                    Scans all possible room ratios generated across each splaying angle. This enables a detailed observation of modal frequency distributions, allowing for the precise determination of the most optimal splay angle.
-                                </p>
+                        <div className="grid md:grid-cols-2 gap-4 text-xs">
+                            <div className="border border-slate-200 p-4 bg-slate-50/50 rounded">
+                                <h3 className="font-bold text-slate-800 mb-1.5 text-sm">Geometric Transformation</h3>
+                                Generates symmetric double-sided splayed listening-room geometries while preserving the dimensional constraints defined by ITU-R BS.1116.
                             </div>
 
-                            {/* Feature 2 */}
-                            <div className="bg-slate-50 border border-slate-200 rounded-b-lg p-6 shadow-sm border-t-4 border-t-amber-500 flex flex-col">
-                                <h3 className="text-slate-900 font-bold text-sm mb-3 flex items-center gap-2">
-                                    <AlertCircle size={18} className="text-amber-500 shrink-0" />
-                                    Axial Cluster Detection
-                                </h3>
-                                <p className="text-sm text-slate-600 leading-relaxed text-justify">
-                                    The optimizer looks for the minimum number of clusters and, among those candidates, selects the setup where the first cluster formation occurs at the highest possible frequency region as the ideal splay angle.
-                                </p>
+                            <div className="border border-slate-200 p-4 bg-slate-50/50 rounded">
+                                <h3 className="font-bold text-slate-800 mb-1.5 text-sm">Analytical Modal Analysis</h3>
+                                Computes room eigenfrequencies using the Rayleigh approximation, enabling rapid comparison between candidate listening-room geometries.
                             </div>
 
-                            {/* Feature 3 */}
-                            <div className="bg-slate-50 border border-slate-200 rounded-b-lg p-6 shadow-sm border-t-4 border-t-purple-500 flex flex-col">
-                                <h3 className="text-slate-900 font-bold text-sm mb-3 flex items-center gap-2">
-                                    <Maximize size={18} className="text-purple-500 shrink-0" />
-                                    Physical Constraints
-                                </h3>
-                                <p className="text-sm text-slate-600 leading-relaxed">
-                                    Strictly enforces physical compliance limits. The engine restricts area outputs outside the <strong>20 – 60 m²</strong> range and triggers immediate visual warnings if the front speaker wall (Wfront) drops below the safe <strong>4.0m</strong> threshold.
-                                </p>
+                            <div className="border border-slate-200 p-4 bg-slate-50/50 rounded">
+                                <h3 className="font-bold text-slate-800 mb-1.5 text-sm">Python-based Finite Element Analysis</h3>
+                                Automatically generates finite element models using Python and performs modal analyses with the scikit-fem library for comparison with the analytical predictions.
                             </div>
 
-                            {/* Feature 4 */}
-                            <div className="bg-slate-50 border border-slate-200 rounded-b-lg p-6 shadow-sm border-t-4 border-t-emerald-500 flex flex-col">
-                                <h3 className="text-slate-900 font-bold text-sm mb-3 flex items-center gap-2">
-                                    <LocateFixed size={18} className="text-emerald-500 shrink-0" />
-                                    Recoverable Zone
-                                </h3>
-                                <p className="text-sm text-slate-600 leading-relaxed text-justify">
-                                    By applying precise angular splaying, the framework shifts some geometries, pulling them back into the ITU-standardized performance region and expanding the functional boundaries of traditional acoustic ratio charts.
-                                </p>
+                            <div className="border border-slate-200 p-4 bg-slate-50/50 rounded">
+                                <h3 className="font-bold text-slate-800 mb-1.5 text-sm">ITU Compliance Assessment</h3>
+                                Evaluates whether the generated room geometries satisfy the dimensional limits adopted by ITU-R BS.1116 after applying symmetric double-sided wall splaying.
                             </div>
                         </div>
                     </section>
@@ -146,7 +121,6 @@ export default function AboutProject() {
 
 
                 </div>
-
             </div>
         </div>
     );

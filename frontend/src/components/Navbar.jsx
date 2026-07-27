@@ -119,7 +119,6 @@ export default function Navbar() {
                     <div className="hidden md:flex items-center ml-auto gap-8">
                         <a href="/" style={{ fontFamily: "base-font" }} onClick={() => setIsOpen(false)} className={navLinkClass}>PROJECT</a>
                         <a href="/calculator" style={{ fontFamily: "base-font" }} onClick={() => setIsOpen(false)} className={navLinkClass}>CALCULATOR</a>
-                        <a href="/fem-result" style={{ fontFamily: "base-font" }} onClick={() => setIsOpen(false)} className={navLinkClass}>FEM ANALYSIS</a>
                     </div>
                 </div>
 
@@ -128,7 +127,6 @@ export default function Navbar() {
                     <div className={`w-full px-2 pt-6 pb-4 flex flex-col gap-1 transition-all duration-500 ease-in-out origin-top ${isScrollingUp ? 'bg-white/10 backdrop-blur-3xl blur-[4px] opacity-40 scale-y-95 pointer-events-none' : 'bg-white/80 backdrop-blur-xl opacity-100 scale-y-100'}`}>
                         <a href="/" style={{ fontFamily: "base-font" }} onClick={() => setIsOpen(false)} className={navLinkClass}>ABOUT PROJECT</a>
                         <a href="/calculator" style={{ fontFamily: "base-font" }} onClick={() => setIsOpen(false)} className={navLinkClass}>CALCULATOR</a>
-                        <a href="/fem-result" style={{ fontFamily: "base-font" }} onClick={() => setIsOpen(false)} className={navLinkClass}>FEM ANALYSIS</a>
                     </div>
                 </div>
             </nav>
