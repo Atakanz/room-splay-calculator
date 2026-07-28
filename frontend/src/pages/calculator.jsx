@@ -125,6 +125,21 @@ export default function Calculator() {
         }
     }, [inputs.wRatio, inputs.lRatio, controlledHeight, inputs.angle, strategyMode, isInputComplete]);
 
+
+    // Invalidate optimization results if geometry changes in optimum mode
+    useEffect(() => {
+        if (strategyMode === 'optimum') {
+            if (result !== null) {
+                setResult(null);
+                setActiveTab(null);
+                setSelectedModalData(null);
+                setReal3DModes([]);
+                setLast3DAnalysis(null);
+            }
+        }
+        // Do not touch initialRoomData
+    }, [currentHeight, parsedWRatio, parsedLRatio, strategyMode]);
+
     // --- 3D SOLVER COPY HANDLERS ---
     const handleCopy3DTable = async () => {
         if (!real3DModes.length) return;
@@ -157,32 +172,42 @@ export default function Calculator() {
     const run3DSolver = async (geomData) => {
         setRunningAngle(geomData.angle_deg);
         setIs3DLoading(true);
-        setIs3DLoading(true);
+
         const wMin = Math.min(geomData.width.front, geomData.width.rear);
         const wMax = Math.max(geomData.width.front, geomData.width.rear);
-
         const activeHeight = currentHeight;
 
-        const data = await real3DAnalysis.calculateReal3DModes(geomData.length, activeHeight, wMin, wMax);
+        try {
+            const data = await real3DAnalysis.calculateReal3DModes(
+                geomData.length,
+                activeHeight,
+                wMin,
+                wMax
+            );
 
-        if (data && data.frequencies) {
-            const calculatedFemFsi = calculateFSI(data.frequencies, 25);
-            setReal3DModes(data.frequencies);
-            setLast3DAnalysis({
-                widthFront: geomData.width.front,
-                widthRear: geomData.width.rear,
-                length: geomData.length,
-                height: activeHeight,
-                angle: geomData.angle_deg,
-                modeName: geomData.modeName,
-                outerRatio: geomData.outerRatio,
-                avgRatio: geomData.avgRatio,
-                fsi: calculatedFemFsi
-            });
+            if (!data) {
+                return;
+            }
+
+            if (data.frequencies) {
+                const calculatedFemFsi = calculateFSI(data.frequencies, 25);
+                setReal3DModes(data.frequencies);
+                setLast3DAnalysis({
+                    widthFront: geomData.width.front,
+                    widthRear: geomData.width.rear,
+                    length: geomData.length,
+                    height: activeHeight,
+                    angle: geomData.angle_deg,
+                    modeName: geomData.modeName,
+                    outerRatio: geomData.outerRatio,
+                    avgRatio: geomData.avgRatio,
+                    fsi: calculatedFemFsi
+                });
+            }
+        } finally {
+            setRunningAngle(null);
+            setIs3DLoading(false);
         }
-        setIs3DLoading(false);
-        setRunningAngle(null);
-        setIs3DLoading(false);
     };
 
     const handleCalculate3D = () => {
@@ -274,8 +299,6 @@ export default function Calculator() {
 
     const handleStop3D = () => {
         real3DAnalysis.cancelReal3DCalculation();
-        setRunningAngle(null);
-        setIs3DLoading(false);
     };
 
     const stepInput = (name, direction, stepValue) => {

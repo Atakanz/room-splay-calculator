@@ -27,8 +27,16 @@ export const calculateReal3DModes = async (lengthMean, currentHeight, wMin, wMax
         const data = await response.json();
         return data;
     } catch (error) {
+        if (error.name === "AbortError") {
+            console.log("3D calculation cancelled.");
+            return null;
+        }
+
         console.error("Real 3D solver servis bağlantı hatası:", error);
         return { frequencies: [], error: error.message };
+    }
+    finally {
+        currentController = null;
     }
 };
 
@@ -36,6 +44,7 @@ export const cancelReal3DCalculation = () => {
 
     if (currentController) {
 
+        console.log("STOP clicked");
         currentController.abort();
 
         currentController = null;
