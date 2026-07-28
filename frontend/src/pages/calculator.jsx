@@ -863,7 +863,7 @@ export default function Calculator() {
                                                     </td>
                                                     <td className="p-2 text-center font-mono text-xs text-slate-600">
                                                         {r.firstClusterAt === 999 ? (
-                                                            <span className="text-emerald-600 font-sans text-xs font-medium">None (Clean)</span>
+                                                            <span className="text-emerald-600 font-sans text-xs font-medium">None</span>
                                                         ) : (
                                                             <span>{r.firstClusterAt} Hz</span>
                                                         )}
