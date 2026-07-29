@@ -125,7 +125,6 @@ export default function Calculator() {
         }
     }, [inputs.wRatio, inputs.lRatio, controlledHeight, inputs.angle, strategyMode, isInputComplete]);
 
-
     // Invalidate optimization results if geometry changes in optimum mode
     useEffect(() => {
         if (strategyMode === 'optimum') {
@@ -137,7 +136,6 @@ export default function Calculator() {
                 setLast3DAnalysis(null);
             }
         }
-        // Do not touch initialRoomData
     }, [currentHeight, parsedWRatio, parsedLRatio, strategyMode]);
 
     // --- 3D SOLVER COPY HANDLERS ---
@@ -493,7 +491,7 @@ export default function Calculator() {
     return (
         <div className="p-4 md:p-8 max-w-7xl mx-auto font-sans text-slate-800 select-none">
 
-            {/* STRATEGY MODE SELECTION - SWITCH SIRASINDA 3D VERİLER SIFIRLANIR */}
+            {/* STRATEGY MODE SELECTION */}
             <div className="grid grid-cols-2 gap-3 mb-6 bg-slate-100 p-1.5 rounded-xl border border-slate-200/60">
                 <button
                     onClick={() => handleSwitchStrategyMode('optimum')}
@@ -572,7 +570,7 @@ export default function Calculator() {
                                 }
                                 onClick={() => stepInput('height', 'down', 0.01)}
                                 className={`px-3 py-1.5 font-bold transition-colors select-none cursor-pointer
-                ${strategyMode === 'controlled'
+                                ${strategyMode === 'controlled'
                                         ? 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 disabled:bg-indigo-50/30 disabled:text-indigo-400/50 disabled:cursor-not-allowed'
                                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200 disabled:bg-slate-50 disabled:text-slate-400/50 disabled:cursor-not-allowed'
                                     }`}
@@ -694,7 +692,7 @@ export default function Calculator() {
                     </div>
                 </div>
 
-                {/* AKILLI GRAFİK ALANI */}
+                {/* ITU COMPLIANCE CHART VISUALIZATION */}
                 <div className="md:col-span-3 border border-slate-200 rounded-xl bg-white shadow-sm overflow-hidden max-w-2xl w-full mx-auto md:mx-0">
                     <button
                         onClick={() => setIsChartVisible(!isChartVisible)}
@@ -720,7 +718,7 @@ export default function Calculator() {
                 </div>
             </div>
 
-            {/* INITIAL ROOM STATE VIEW WITH FSI ROZETİ */}
+            {/* INITIAL ROOM STATE VIEW */}
             {isInputComplete && (
                 <div className="mb-6 p-4 bg-slate-900 text-white rounded-xl shadow-md animate-in fade-in duration-200">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-700 pb-2 mb-3 gap-3">
@@ -753,7 +751,7 @@ export default function Calculator() {
                                 )
                             ) : (
                                 initialRoomData.areaWarning ? (
-                                    <span className="text-rose-400 flex items-center gap-1 font-mono">
+                                    <span className="text-rose-400 text-[13px] sm:text-xs flex items-center gap-1 font-mono">
                                         <MdWarning size={15} /> Non-Compliant (Area {initialRoomData.areaWarning})
                                     </span>
                                 ) : initialRoomData.isItuCompliant ? (
@@ -772,18 +770,18 @@ export default function Calculator() {
                     <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-sm min-h-[120px]">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 pb-1 border-b border-slate-700/50 gap-2">
                             <p className="text-[11px] uppercase text-slate-400 font-bold">Rayleigh Analytic Modes (&lt;200Hz)</p>
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                                 <button
                                     onClick={() => handleCopyRayleighTable(initialRoomData.modes)}
                                     disabled={!initialRoomData.modes?.length}
-                                    className="px-2.5 py-1 rounded bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-white text-[10px] font-bold transition-opacity cursor-pointer"
+                                    className="px-2.5 py-1 rounded bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-white text-[10px] font-bold transition-opacity cursor-pointer w-full sm:w-auto"
                                 >
                                     COPY TABLE
                                 </button>
                                 <button
                                     onClick={() => handleCopyRayleighFrequencyList(initialRoomData.modes)}
                                     disabled={!initialRoomData.modes?.length}
-                                    className="px-2.5 py-1 rounded bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-white text-[10px] font-bold transition-opacity cursor-pointer"
+                                    className="px-2.5 py-1 rounded bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-white text-[10px] font-bold transition-opacity cursor-pointer w-full sm:w-auto"
                                 >
                                     COPY FREQUENCY LIST
                                 </button>
@@ -792,26 +790,53 @@ export default function Calculator() {
 
                         <div className="max-h-64 overflow-y-auto flex flex-col gap-1.5 font-mono text-xs pr-1 select-text" style={{ userSelect: 'text' }}>
                             {initialRoomData.modes.map((m, idx) => (
-                                <div key={idx} className="flex items-center justify-between p-2 rounded bg-slate-950/60 border border-slate-800/80 text-slate-200 shadow-3xs select-text hover:bg-slate-900/80 transition-colors">
-                                    <span className="text-slate-500 text-[11px] w-8 shrink-0">#{idx + 1}</span>
-                                    <div className="flex items-center justify-center gap-1.5 flex-1 text-center">
-                                        <span className={`font-bold text-sm ${m.type === 'Axial' ? 'text-red-400' : 'text-slate-300'}`}>
-                                            {m.freq} Hz
-                                        </span>
-                                        <span className="text-[10px] font-sans text-slate-400 bg-slate-800/80 px-1.5 py-0.5 rounded border border-slate-700/50">
-                                            ({m.type})
-                                        </span>
-                                    </div>
-                                    <span className="text-slate-400 text-[11px] w-20 text-right font-mono shrink-0">
-                                        {m.label || ''}
-                                    </span>
-                                    <div className="w-24 flex justify-end shrink-0 ml-2">
-                                        {m.type === 'Axial' && m.clustering ? (
-                                            <span className="text-[10px] text-rose-400 font-bold bg-rose-950/80 px-2 py-0.5 rounded border border-rose-800/80 flex items-center gap-1 animate-pulse">
-                                                ⚠️ Cluster
+                                <div
+                                    key={idx}
+                                    className="rounded bg-slate-950/60 border border-slate-800/80 text-slate-200 shadow-3xs hover:bg-slate-900/80 transition-colors p-3"
+                                >
+                                    <div className="hidden md:flex items-center justify-between select-text">
+                                        <span className="text-slate-500 text-[11px] w-8 shrink-0">#{idx + 1}</span>
+                                        <div className="flex items-center justify-center gap-1.5 flex-1 text-center">
+                                            <span className={`font-bold text-sm ${m.type === 'Axial' ? 'text-red-400' : 'text-slate-300'}`}>
+                                                {m.freq} Hz
                                             </span>
-                                        ) : (
-                                            <div className="w-full"></div>
+                                            <span className="text-[10px] font-sans text-slate-400 bg-slate-800/80 px-1.5 py-0.5 rounded border border-slate-700/50">
+                                                ({m.type})
+                                            </span>
+                                        </div>
+                                        <span className="text-slate-400 text-[11px] w-20 text-right font-mono shrink-0">
+                                            {m.label || ''}
+                                        </span>
+                                        <div className="w-24 flex justify-end shrink-0 ml-2">
+                                            {m.type === 'Axial' && m.clustering ? (
+                                                <span className="text-[10px] text-rose-400 font-bold bg-rose-950/80 px-2 py-0.5 rounded border border-rose-800/80 flex items-center gap-1 animate-pulse">
+                                                    ⚠️ Cluster
+                                                </span>
+                                            ) : (
+                                                <div className="w-full"></div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="md:hidden space-y-2">
+                                        <div className="flex items-start justify-between">
+                                            <span className="text-slate-500 text-xs">#{idx + 1}</span>
+                                            <span className={`font-bold text-lg ${m.type === 'Axial' ? 'text-red-400' : 'text-slate-200'}`}>
+                                                {m.freq} Hz
+                                            </span>
+                                        </div>
+
+                                        <div className="flex items-center justify-between text-xs">
+                                            <span className="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">
+                                                {m.type}
+                                            </span>
+                                            <span className="font-mono text-slate-400">{m.label || '-'}</span>
+                                        </div>
+
+                                        {m.type === 'Axial' && m.clustering && (
+                                            <div className="text-[11px] text-rose-400 font-bold bg-rose-950/80 px-2 py-1 rounded border border-rose-800/80 inline-flex items-center gap-1">
+                                                ⚠️ Cluster
+                                            </div>
                                         )}
                                     </div>
                                 </div>
@@ -905,9 +930,9 @@ export default function Calculator() {
                                         <div className="p-4 bg-slate-900 text-white rounded-xl shadow-md border border-slate-800">
                                             <div className="flex justify-between items-center border-b border-slate-700 pb-2 mb-3">
                                                 <div>
-                                                    <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-400">
-                                                        Target Angle Analytic Rayleigh Response ({selectedModalData.angle}° Splay)
-                                                    </h3>
+                                                    <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-indigo-400">
+                                                        Splayed Averaging Response {selectedModalData.angle}°
+                                                    </p>
                                                     <p className="text-xs text-slate-400 font-mono">{selectedModalData.ratio}</p>
                                                 </div>
                                                 {selectedModalData.fsi && (
@@ -920,18 +945,18 @@ export default function Calculator() {
                                             <div className="bg-slate-800/60 p-3 rounded-lg border border-slate-700 text-sm min-h-[120px]">
                                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 pb-1 border-b border-slate-700/50 gap-2">
                                                     <p className="text-[11px] uppercase text-slate-400 font-bold">Calculated (&lt;200Hz)</p>
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                                                         <button
                                                             onClick={() => handleCopyRayleighTable(selectedModalData.modes)}
                                                             disabled={!selectedModalData.modes?.length}
-                                                            className="px-2.5 py-1 rounded bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-white text-[10px] font-bold transition-opacity cursor-pointer"
+                                                            className="px-2.5 py-1 rounded bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-white text-[10px] font-bold transition-opacity cursor-pointer w-full sm:w-auto"
                                                         >
                                                             COPY TABLE
                                                         </button>
                                                         <button
                                                             onClick={() => handleCopyRayleighFrequencyList(selectedModalData.modes)}
                                                             disabled={!selectedModalData.modes?.length}
-                                                            className="px-2.5 py-1 rounded bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-white text-[10px] font-bold transition-opacity cursor-pointer"
+                                                            className="px-2.5 py-1 rounded bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-white text-[10px] font-bold transition-opacity cursor-pointer w-full sm:w-auto"
                                                         >
                                                             COPY FREQUENCY LIST
                                                         </button>
@@ -940,26 +965,53 @@ export default function Calculator() {
 
                                                 <div className="max-h-64 overflow-y-auto flex flex-col gap-1.5 font-mono text-xs pr-1 select-text" style={{ userSelect: 'text' }}>
                                                     {selectedModalData.modes.map((m, idx) => (
-                                                        <div key={idx} className="flex items-center justify-between p-2 rounded bg-slate-950/60 border border-slate-800/80 text-slate-200 shadow-3xs select-text hover:bg-slate-900/80 transition-colors">
-                                                            <span className="text-slate-500 text-[11px] w-8 shrink-0">#{idx + 1}</span>
-                                                            <div className="flex items-center justify-center gap-1.5 flex-1 text-center">
-                                                                <span className={`font-bold text-sm ${m.type === 'Axial' ? 'text-red-400' : 'text-slate-300'}`}>
-                                                                    {m.freq} Hz
-                                                                </span>
-                                                                <span className="text-[10px] font-sans text-slate-400 bg-slate-800/80 px-1.5 py-0.5 rounded border border-slate-700/50">
-                                                                    ({m.type})
-                                                                </span>
-                                                            </div>
-                                                            <span className="text-slate-400 text-[11px] w-20 text-right font-mono shrink-0">
-                                                                {m.label || ''}
-                                                            </span>
-                                                            <div className="w-24 flex justify-end shrink-0 ml-2">
-                                                                {m.type === 'Axial' && m.clustering ? (
-                                                                    <span className="text-[10px] text-rose-400 font-bold bg-rose-950/80 px-2 py-0.5 rounded border border-rose-800/80 flex items-center gap-1 animate-pulse">
-                                                                        ⚠️ Cluster
+                                                        <div
+                                                            key={idx}
+                                                            className="rounded bg-slate-950/60 border border-slate-800/80 text-slate-200 shadow-3xs hover:bg-slate-900/80 transition-colors p-3"
+                                                        >
+                                                            <div className="hidden md:flex items-center justify-between select-text">
+                                                                <span className="text-slate-500 text-[11px] w-8 shrink-0">#{idx + 1}</span>
+                                                                <div className="flex items-center justify-center gap-1.5 flex-1 text-center">
+                                                                    <span className={`font-bold text-sm ${m.type === 'Axial' ? 'text-red-400' : 'text-slate-300'}`}>
+                                                                        {m.freq} Hz
                                                                     </span>
-                                                                ) : (
-                                                                    <div className="w-full"></div>
+                                                                    <span className="text-[10px] font-sans text-slate-400 bg-slate-800/80 px-1.5 py-0.5 rounded border border-slate-700/50">
+                                                                        ({m.type})
+                                                                    </span>
+                                                                </div>
+                                                                <span className="text-slate-400 text-[11px] w-20 text-right font-mono shrink-0">
+                                                                    {m.label || ''}
+                                                                </span>
+                                                                <div className="w-24 flex justify-end shrink-0 ml-2">
+                                                                    {m.type === 'Axial' && m.clustering ? (
+                                                                        <span className="text-[10px] text-rose-400 font-bold bg-rose-950/80 px-2 py-0.5 rounded border border-rose-800/80 flex items-center gap-1 animate-pulse">
+                                                                            ⚠️ Cluster
+                                                                        </span>
+                                                                    ) : (
+                                                                        <div className="w-full"></div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="md:hidden space-y-2">
+                                                                <div className="flex items-start justify-between">
+                                                                    <span className="text-slate-500 text-xs">#{idx + 1}</span>
+                                                                    <span className={`font-bold text-lg ${m.type === 'Axial' ? 'text-red-400' : 'text-slate-200'}`}>
+                                                                        {m.freq} Hz
+                                                                    </span>
+                                                                </div>
+
+                                                                <div className="flex items-center justify-between text-xs">
+                                                                    <span className="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">
+                                                                        {m.type}
+                                                                    </span>
+                                                                    <span className="font-mono text-slate-400">{m.label || '-'}</span>
+                                                                </div>
+
+                                                                {m.type === 'Axial' && m.clustering && (
+                                                                    <div className="text-[11px] text-rose-400 font-bold bg-rose-950/80 px-2 py-1 rounded border border-rose-800/80 inline-flex items-center gap-1">
+                                                                        ⚠️ Cluster
+                                                                    </div>
                                                                 )}
                                                             </div>
                                                         </div>
@@ -1015,67 +1067,54 @@ export default function Calculator() {
                                     </div>
                                 )}
                             </div>
-                            <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                                <div className="flex flex-wrap gap-2 mb-2">
-                                    {strategyMode === 'controlled' && (
 
-                                        is3DLoading ? (
+                            {/* DÜZENLENEN VE HİZALANAN BUTON ALANI */}
+                            <div className="mt-3 grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
+                                {strategyMode === 'controlled' && (
+                                    is3DLoading ? (
+                                        <button
+                                            onClick={handleStop3D}
+                                            className="px-3 py-2 rounded bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-colors cursor-pointer flex items-center justify-center"
+                                        >
+                                            STOP
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={handleCalculate3D}
+                                            className="px-3 py-2 rounded bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1"
+                                        >
+                                            <MdPlayArrow size={14} /> 3D RUN
+                                        </button>
+                                    )
+                                )}
 
-                                            <button
+                                <button
+                                    onClick={handleCopy3DTable}
+                                    disabled={!real3DModes.length}
+                                    className="px-3 py-2 rounded bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-white text-xs font-bold transition-opacity cursor-pointer flex items-center justify-center"
+                                >
+                                    COPY TABLE
+                                </button>
 
-                                                onClick={handleStop3D}
+                                <button
+                                    onClick={handleCopy3DFrequencyList}
+                                    disabled={!real3DModes.length}
+                                    className="px-3 py-2 rounded bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-white text-xs font-bold transition-opacity cursor-pointer flex items-center justify-center"
+                                >
+                                    COPY FREQUENCIES
+                                </button>
 
-                                                className="px-3 py-2 rounded bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-colors"
-
-                                            >
-
-                                                STOP
-
-                                            </button>
-
-                                        ) : (
-
-                                            <button
-
-                                                onClick={handleCalculate3D}
-
-                                                className="px-3 py-2 rounded bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold transition-colors"
-
-                                            >
-
-                                                CALCULATE MODES
-
-                                            </button>
-
-                                        )
-
-                                    )}
-                                    <button
-                                        onClick={handleCopy3DTable}
-                                        disabled={!real3DModes.length}
-                                        className="px-3 py-2 rounded bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-white text-xs font-bold transition-opacity cursor-pointer"
-                                    >
-                                        COPY TABLE
-                                    </button>
-                                    <button
-                                        onClick={handleCopy3DFrequencyList}
-                                        disabled={!real3DModes.length}
-                                        className="px-3 py-2 rounded bg-slate-700 hover:bg-slate-600 disabled:opacity-40 text-white text-xs font-bold transition-opacity cursor-pointer"
-                                    >
-                                        COPY FREQUENCY LIST
-                                    </button>
-                                    <button
-                                        onClick={handleSave3DResult}
-                                        disabled={!real3DModes.length}
-                                        className="px-3 py-2 rounded bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
-                                    >
-                                        <MdSave size={14} />{saved3DRuns.length > 0 ? 'ADD TO LIST' : ' SAVE RESULT'}
-                                    </button>
-                                </div>
+                                <button
+                                    onClick={handleSave3DResult}
+                                    disabled={!real3DModes.length}
+                                    className="px-3 py-2 rounded bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white text-xs font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                                >
+                                    <MdSave size={15} /> {saved3DRuns.length > 0 ? 'ADD' : 'SAVE'}
+                                </button>
                             </div>
 
                             {!is3DLoading && last3DAnalysis && (
-                                <div className="text-[10px] font-mono text-slate-400 text-right mt-1">
+                                <div className="text-[10px] font-mono text-slate-400 text-right mt-2">
                                     Wf {last3DAnalysis.widthFront.toFixed(2)} m | Wr {last3DAnalysis.widthRear.toFixed(2)} m | L {last3DAnalysis.length.toFixed(2)} m | H {last3DAnalysis.height.toFixed(2)} m | {last3DAnalysis.angle}° ({last3DAnalysis.modeName})
                                 </div>
                             )}

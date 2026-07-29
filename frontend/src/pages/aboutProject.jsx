@@ -115,8 +115,6 @@ export default function AboutProject() {
                         </div>
                     </section>
 
-
-
                 </div>
             </div>
         </div>

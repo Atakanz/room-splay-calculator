@@ -112,7 +112,6 @@ export default function AnsysResult() {
                         </div>
                     </section>
 
-
                     {/* ==================== FRAMEWORK 2 ==================== */}
                     <section className="border-l-4 border-indigo-500 pl-4 md:pl-6 space-y-6 pt-4">
                         <div className="bg-indigo-900 text-white px-4 py-2 text-xs font-mono inline-block uppercase tracking-wider font-bold rounded-sm">

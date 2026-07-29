@@ -7,7 +7,6 @@ export default function Footer() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-
     return (
         <footer className="w-full bg-white border-t border-neutral-200/80 pt-12 md:pt-16 pb-8 px-4 sm:px-6 md:px-8 xl:px-12 overflow-hidden">
 
@@ -62,7 +61,6 @@ export default function Footer() {
                         </div>
 
                     </div>
-
 
                 </div>
 

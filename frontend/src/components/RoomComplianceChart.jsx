@@ -71,7 +71,7 @@ export default function RoomComplianceChart({ inputs, outputs, highlightZone }) 
 
             <div className="w-full h-full mt-4">
                 <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={chartData} margin={{ top: 20, right: 15, bottom: 25, left: -15 }}>
+                    <ComposedChart data={chartData} margin={{ top: 20, right: 20, bottom: 25, left: 10 }}>
                         <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" />
                         <XAxis
                             dataKey="Sw"
@@ -81,8 +81,15 @@ export default function RoomComplianceChart({ inputs, outputs, highlightZone }) 
                             stroke="#94a3b8"
                             fontSize={10}
                             fontFamily="monospace"
-                            dy={10}
-                            label={{ value: 'Sw (Width / Height)', position: 'insideBottom', offset: -15, fill: '#64748b', fontSize: 11, fontWeight: 'bold' }}
+                            dy={5}
+                            label={{ 
+                                value: 'Sw (Width / Height)', 
+                                position: 'insideBottom', 
+                                offset: -15, 
+                                fill: '#64748b', 
+                                fontSize: 11, 
+                                fontWeight: 'bold' 
+                            }}
                         />
                         <YAxis
                             type="number"
@@ -91,8 +98,17 @@ export default function RoomComplianceChart({ inputs, outputs, highlightZone }) 
                             stroke="#94a3b8"
                             fontSize={10}
                             fontFamily="monospace"
-                            dx={-5}
-                            label={{ value: 'SL (Length / Height)', position: 'insideLeft', offset: 5, angle: -90, fill: '#64748b', fontSize: 11, fontWeight: 'bold' }}
+                            dx={-2}
+                            label={{
+                                value: 'SL (Length / Height)',
+                                angle: -90,
+                                position: 'insideLeft',
+                                offset: 5,
+                                fill: '#64748b',
+                                fontSize: 11,
+                                fontWeight: 'bold',
+                                style: { textAnchor: 'middle' }
+                            }}
                         />
 
                         <Area
@@ -135,5 +151,3 @@ export default function RoomComplianceChart({ inputs, outputs, highlightZone }) 
         </div>
     );
 }
-
-// ... ITU_FUNCTIONS ve generateChartData kısımları aynı kalacak
