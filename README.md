@@ -2,8 +2,6 @@
 
 An interactive web application and Python framework designed to systematically transform standardized rectangular room ratios into symmetric double-sided splayed geometries while preserving ITU-R BS.1116 dimensional constraints.
 
-![App Interface](https://controlledsplay.vercel.app/og-image.png) <!-- Varsa arayüzden bir ekran görüntüsü linki -->
-
 ## 1. Research Motivation
 ITU-R BS.1116 defines dimensional recommendations for critical listening rooms and encourages the use of non-parallel walls. However, a computational framework for systematically transforming standardized rectangular room ratios into symmetric double-sided splayed geometries has not been established. 
 
