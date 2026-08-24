@@ -1,8 +1,8 @@
-const API_BASE_URL = 'https://icsvwebsite-534923853316.europe-west1.run.app/api';
+const API_BASE_URL = 'http://localhost:8080/api';
 // http://localhost:8080/api
 // https://icsvwebsite-534923853316.europe-west1.run.app/api
 let currentController = null;
-export const calculateReal3DModes = async (lengthMean, currentHeight, wMin, wMax) => {
+export const calculateReal3DModes = async (lengthMean, currentHeight, wMin, wMax, splayType = 'double') => {
     currentController = new AbortController();
     try {
         const response = await fetch(`${API_BASE_URL}/calculate-modes`, {
@@ -15,7 +15,8 @@ export const calculateReal3DModes = async (lengthMean, currentHeight, wMin, wMax
                 lengthMean: Number(lengthMean),
                 currentHeight: Number(currentHeight),
                 wMin: Number(wMin),
-                wMax: Number(wMax)
+                wMax: Number(wMax),
+                splayType: splayType === 'single' ? 'single' : 'double'
             })
         });
 

@@ -5,7 +5,7 @@ import { getProceduralRandomRatio } from '../../services/zoneAnalysis.js';
 import { calculateFSI } from '../../services/fsiCalculator.js';
 import {
     MdAssessment, MdCheckCircle, MdCancel, MdLayers, MdArchitecture,
-    MdExpandMore, MdExpandLess, MdLock, MdWarning, MdPlayArrow, MdSave, MdDelete
+    MdExpandMore, MdExpandLess, MdWarning, MdPlayArrow, MdSave, MdDelete
 } from 'react-icons/md';
 import RoomComplianceChart from '../components/RoomComplianceChart.jsx';
 import * as real3DAnalysis from '../../services/real3DAnalysis.js';
@@ -15,6 +15,8 @@ import ControlledRoomVisualizer from '../components/ControlledRoomVisualizer.jsx
 
 export default function Calculator() {
     const [strategyMode, setStrategyMode] = useState('optimum');
+    // Splay type state: 'double' | 'single'
+    const [splayType, setSplayType] = useState('double');
     const [isChartVisible, setIsChartVisible] = useState(true);
     const [highlightZone, setHighlightZone] = useState(null);
     const [real3DModes, setReal3DModes] = useState([]);
@@ -56,16 +58,19 @@ export default function Calculator() {
     const rawInputHeight = !isNaN(parsedHeight) ? Math.max(0.1, parsedHeight) : 2.5;
 
     const designMetrics = isInputComplete
-        ? analysis.calculateDesignPhaseMetrics(safeSw, safeSL, Number(inputs.angle || 0))
+        ? analysis.calculateDesignPhaseMetrics(safeSw, safeSL, Number(inputs.angle || 0), splayType)
         : null;
 
     const hMinArea = isInputComplete ? Math.sqrt(20 / (safeSw * safeSL)) : 2.5;
     const optimumMinH = Number(Math.max(2.5, hMinArea).toFixed(2));
-    const controlledEffectiveMinH = Number(Math.max(designMetrics?.hMin || 2.5, optimumMinH).toFixed(2));
+    const controlledEffectiveMinH = 2.5;
+    const controlledWallLimitH = Number((designMetrics?.hMin || 2.5).toFixed(2));
 
     const currentHeight = strategyMode === 'controlled'
-        ? Math.max(controlledHeight, controlledEffectiveMinH)
+        ? Math.max(Number(controlledHeight) || controlledEffectiveMinH, controlledEffectiveMinH)
         : rawInputHeight;
+
+    const controlledWallWarning = strategyMode === 'controlled' && currentHeight < controlledWallLimitH;
 
     let w = currentHeight * safeSw;
     let l = currentHeight * safeSL;
@@ -89,7 +94,7 @@ export default function Calculator() {
 
     useEffect(() => {
         if (strategyMode !== 'controlled' || !isInputComplete) return;
-        setControlledHeight(prev => Number(Math.max(Number(prev) || 0, controlledEffectiveMinH).toFixed(2)));
+        setControlledHeight(prev => Number(Math.max(Number(prev) || controlledEffectiveMinH, controlledEffectiveMinH).toFixed(2)));
     }, [strategyMode, controlledEffectiveMinH, isInputComplete]);
 
     useEffect(() => {
@@ -100,14 +105,16 @@ export default function Calculator() {
         const isItuCompliant = analysis.checkRatio(currentRatioW, currentRatioL);
 
         let areaWarning = null;
-        if (currentArea < 20) areaWarning = '< 20m²';
-        else if (currentArea > 60) areaWarning = '> 60m²';
+        if (strategyMode !== 'controlled') {
+            if (currentArea < 20) areaWarning = '< 20m²';
+            else if (currentArea > 60) areaWarning = '> 60m²';
+        }
 
         const rawFreqs = modes.map(m => m.freq);
         const fsiVal = calculateFSI(rawFreqs, 25);
 
         setInitialRoomData({ modes, isItuCompliant, areaWarning, fsi: fsiVal });
-    }, [currentHeight, isInputComplete, w, l, currentArea]);
+    }, [currentHeight, isInputComplete, w, l, currentArea, strategyMode]);
 
     useEffect(() => {
         if (strategyMode === 'controlled' && result !== null) {
@@ -119,11 +126,12 @@ export default function Calculator() {
                 parsedWRatio,
                 parsedLRatio,
                 controlledHeight,
-                Number(inputs.angle || 0)
+                Number(inputs.angle || 0),
+                splayType
             );
             setResult(updatedResult);
         }
-    }, [inputs.wRatio, inputs.lRatio, controlledHeight, inputs.angle, strategyMode, isInputComplete]);
+    }, [inputs.wRatio, inputs.lRatio, controlledHeight, inputs.angle, strategyMode, isInputComplete, splayType]);
 
     // Invalidate optimization results if geometry changes in optimum mode
     useEffect(() => {
@@ -136,7 +144,7 @@ export default function Calculator() {
                 setLast3DAnalysis(null);
             }
         }
-    }, [currentHeight, parsedWRatio, parsedLRatio, strategyMode]);
+    }, [currentHeight, parsedWRatio, parsedLRatio, strategyMode, splayType]);
 
     // --- 3D SOLVER COPY HANDLERS ---
     const handleCopy3DTable = async () => {
@@ -167,60 +175,90 @@ export default function Calculator() {
         try { await navigator.clipboard.writeText(modes.map(m => m.freq).join('\n')); } catch (err) { console.error('Copy failed:', err); }
     };
 
-    const run3DSolver = async (geomData) => {
-        setRunningAngle(geomData.angle_deg);
-        setIs3DLoading(true);
+const run3DSolver = async (geomData) => {
+    setRunningAngle(geomData.angle_deg);
+    setIs3DLoading(true);
 
-        const wMin = Math.min(geomData.width.front, geomData.width.rear);
-        const wMax = Math.max(geomData.width.front, geomData.width.rear);
-        const activeHeight = currentHeight;
+    const wMin = Math.min(geomData.width.front, geomData.width.rear);
+    const wMax = Math.max(geomData.width.front, geomData.width.rear);
+    const activeHeight = geomData.height ?? currentHeight;
 
-        try {
-            const data = await real3DAnalysis.calculateReal3DModes(
-                geomData.length,
-                activeHeight,
-                wMin,
-                wMax
-            );
+    // FEM geometry convention:
+    // - Double-sided: both longitudinal edges have the same physical length.
+    //   The solver receives that common length.
+    // - Single-sided: one longitudinal edge is straight (the original
+    //   rectangular length) and the opposite edge is splayed. The FEM mesh
+    //   uses the straight edge as the x-direction reference length; the
+    //   width taper (wMin -> wMax) creates the inclined wall. The two physical
+    //   edge lengths are retained only for reporting.
+    const lengthStraight =
+        geomData.lengthStraight ??
+        geomData.lengthEdges?.straight ??
+        geomData.length;
 
-            if (!data) {
-                return;
-            }
+    const lengthSplayed =
+        geomData.lengthSplayed ??
+        geomData.lengthEdges?.splayed ??
+        geomData.length;
 
-            if (data.frequencies) {
-                const calculatedFemFsi = calculateFSI(data.frequencies, 25);
-                setReal3DModes(data.frequencies);
-                setLast3DAnalysis({
-                    widthFront: geomData.width.front,
-                    widthRear: geomData.width.rear,
-                    length: geomData.length,
-                    height: activeHeight,
-                    angle: geomData.angle_deg,
-                    modeName: geomData.modeName,
-                    outerRatio: geomData.outerRatio,
-                    avgRatio: geomData.avgRatio,
-                    fsi: calculatedFemFsi
-                });
-            }
-        } finally {
-            setRunningAngle(null);
-            setIs3DLoading(false);
+    const femLength = splayType === 'single'
+        ? lengthStraight
+        : (geomData.femLength ?? geomData.length);
+
+    try {
+        const data = await real3DAnalysis.calculateReal3DModes(
+            femLength,
+            activeHeight,
+            wMin,
+            wMax,
+            splayType
+        );
+
+        if (!data) {
+            return;
         }
-    };
 
-    const handleCalculate3D = () => {
-        if (strategyMode === 'controlled' && result) {
-            run3DSolver({
-                width: result.width,
-                length: splayedL,
-                height: currentHeight,
-                angle_deg: result.angle_deg,
-                modeName: 'Controlled',
-                outerRatio: `1:${parsedWRatio.toFixed(2)}:${parsedLRatio.toFixed(2)}`,
-                avgRatio: `1:${result.w_ratio.toFixed(2)}:${result.l_ratio.toFixed(2)}`
+        if (data.frequencies) {
+            const calculatedFemFsi = calculateFSI(data.frequencies, 25);
+            setReal3DModes(data.frequencies);
+            setLast3DAnalysis({
+                widthFront: geomData.width.front,
+                widthRear: geomData.width.rear,
+                length: femLength,
+                lengthStraight,
+                lengthSplayed,
+                lengthEdgeFront: lengthSplayed,
+                lengthEdgeRear: lengthStraight,
+                height: activeHeight,
+                angle: geomData.angle_deg,
+                modeName: geomData.modeName,
+                splayType,
+                outerRatio: geomData.outerRatio,
+                avgRatio: geomData.avgRatio,
+                fsi: calculatedFemFsi
             });
         }
-    };
+    } finally {
+        setRunningAngle(null);
+        setIs3DLoading(false);
+    }
+};
+
+const handleCalculate3D = () => {
+    if (strategyMode === 'controlled' && result) {
+        run3DSolver({
+            width: result.width,
+            length: result.length,
+            lengthStraight: result.lengthEdges?.straight ?? result.length,
+            lengthSplayed: result.lengthEdges?.splayed ?? result.length,
+            height: currentHeight,
+            angle_deg: result.angle_deg,
+            modeName: splayType === 'single' ? 'Controlled Single-sided' : 'Controlled Double-sided',
+            outerRatio: `1:${parsedWRatio.toFixed(2)}:${parsedLRatio.toFixed(2)}`,
+            avgRatio: `1:${result.w_ratio.toFixed(2)}:${result.l_ratio.toFixed(2)}`
+        });
+    }
+};
 
     const scrollToSavedTable = () => {
         setTimeout(() => {
@@ -234,9 +272,10 @@ export default function Calculator() {
             id: Date.now(),
             angle: last3DAnalysis.angle,
             modeName: last3DAnalysis.modeName || (strategyMode === 'controlled' ? 'Controlled' : 'Inward'),
+            splayType: last3DAnalysis.splayType || splayType,
             outerRatio: last3DAnalysis.outerRatio || `1:${parsedWRatio.toFixed(2)}:${parsedLRatio.toFixed(2)}`,
             avgRatio: last3DAnalysis.avgRatio || 'N/A',
-            dimensions: `${last3DAnalysis.widthFront.toFixed(2)}m / ${last3DAnalysis.widthRear.toFixed(2)}m x ${last3DAnalysis.length.toFixed(2)}m`,
+            dimensions: `Wf ${last3DAnalysis.widthFront.toFixed(2)}m / Wr ${last3DAnalysis.widthRear.toFixed(2)}m | Lf ${last3DAnalysis.lengthEdgeFront.toFixed(2)}m / Lr ${last3DAnalysis.lengthEdgeRear.toFixed(2)}m`,
             height: last3DAnalysis.height,
             frequencies: [...real3DModes],
             fsi: last3DAnalysis.fsi
@@ -277,13 +316,8 @@ export default function Calculator() {
 
             if (isCurrentlyComplete) {
                 if (strategyMode === 'controlled') {
-                    const newHMinArea = Math.sqrt(20 / (currentW * currentL));
-                    const newOptimumMinH = parseFloat(Math.max(2.5, newHMinArea).toFixed(2));
-                    const newDesignMetrics = analysis.calculateDesignPhaseMetrics(currentW, currentL, Number(nextInputs.angle || 0));
-                    const newControlledEffectiveMinH = parseFloat(Math.max(newDesignMetrics?.hMin || 2.5, newOptimumMinH).toFixed(2));
-
                     setInputs(nextInputs);
-                    setControlledHeight(prev => parseFloat(Math.max(Number(prev), newControlledEffectiveMinH).toFixed(2)));
+                    setControlledHeight(prev => parseFloat(Math.max(Number(prev) || 2.5, 2.5).toFixed(2)));
                 } else {
                     setInputs(nextInputs);
                 }
@@ -303,15 +337,15 @@ export default function Calculator() {
         if (name === 'height') {
             if (strategyMode === 'controlled') {
                 setControlledHeight(prev => {
-                    const currentVal = Number(prev) || 0;
+                    const currentVal = Number(prev) || controlledEffectiveMinH;
                     const newVal = direction === 'up' ? currentVal + stepValue : currentVal - stepValue;
                     return parseFloat(Math.max(controlledEffectiveMinH, newVal).toFixed(2));
                 });
             } else {
                 setInputs(prev => {
-                    const currentVal = Number(prev.height) || 0;
+                    const currentVal = Number(prev.height) || optimumMinH;
                     const newVal = direction === 'up' ? currentVal + stepValue : currentVal - stepValue;
-                    return { ...prev, height: parseFloat(Math.max(0.1, newVal).toFixed(2)) };
+                    return { ...prev, height: parseFloat(Math.max(optimumMinH, newVal).toFixed(2)) };
                 });
             }
             return;
@@ -326,15 +360,8 @@ export default function Calculator() {
         const nextInputs = { ...inputs, [name]: finalVal };
 
         if (strategyMode === 'controlled') {
-            const newSafeSw = Math.max(0.1, Number(nextInputs.wRatio) || 0.1);
-            const newSafeSL = Math.max(0.1, Number(nextInputs.lRatio) || 0.1);
-            const newHMinArea = Math.sqrt(20 / (newSafeSw * newSafeSL));
-            const newOptimumMinH = parseFloat(Math.max(2.5, newHMinArea).toFixed(2));
-            const newDesignMetrics = analysis.calculateDesignPhaseMetrics(newSafeSw, newSafeSL, Number(nextInputs.angle || 0));
-            const newControlledEffectiveMinH = parseFloat(Math.max(newDesignMetrics?.hMin || 2.5, newOptimumMinH).toFixed(2));
-
             setInputs(nextInputs);
-            setControlledHeight(prev => parseFloat(Math.max(Number(prev), newControlledEffectiveMinH).toFixed(2)));
+            setControlledHeight(prev => parseFloat(Math.max(Number(prev) || 2.5, 2.5).toFixed(2)));
         } else {
             setInputs(nextInputs);
         }
@@ -354,17 +381,12 @@ export default function Calculator() {
         const coords = getProceduralRandomRatio(zone);
 
         if (strategyMode === 'controlled') {
-            const newHMinArea = Math.sqrt(20 / (coords.wRatio * coords.lRatio));
-            const newOptimumMinH = parseFloat(Math.max(2.5, newHMinArea).toFixed(2));
-            const newDesignMetrics = analysis.calculateDesignPhaseMetrics(coords.wRatio, coords.lRatio, inputs.angle);
-            const newControlledEffectiveMinH = parseFloat(Math.max(newDesignMetrics?.hMin || 2.5, newOptimumMinH).toFixed(2));
-
             setInputs(prev => ({
                 ...prev,
                 wRatio: Number(coords.wRatio.toFixed(2)),
                 lRatio: Number(coords.lRatio.toFixed(2))
             }));
-            setControlledHeight(prev => Math.max(prev, newControlledEffectiveMinH));
+            setControlledHeight(prev => Math.max(Number(prev) || 2.5, 2.5));
         } else {
             setInputs(prev => ({
                 ...prev,
@@ -385,7 +407,7 @@ export default function Calculator() {
         const safeHeight = !isNaN(parsedHeight) && parsedHeight > 0 ? parsedHeight : currentHeight;
 
         try {
-            const origRes = analysis.calculateTheOptimumRatio(w, l, safeHeight);
+            const origRes = analysis.calculateTheOptimumRatio(w, l, safeHeight, splayType);
 
             if (!origRes || !Array.isArray(origRes)) {
                 console.error("Optimum ratio calculation returned empty or invalid data.");
@@ -406,7 +428,12 @@ export default function Calculator() {
 
                 const angleRad = (row.angle * Math.PI) / 180;
                 const physicalLength = l / Math.cos(angleRad);
-                const physicalWidthShort = w - (2 * l * Math.tan(angleRad));
+                let physicalWidthShort;
+                if (splayType === 'single') {
+                    physicalWidthShort = w - (l * Math.tan(angleRad));
+                } else {
+                    physicalWidthShort = w - (2 * l * Math.tan(angleRad));
+                }
                 const physicalWidthLong = w;
 
                 const totalClusters = targetModesResult?.meta?.totalAxialClusters ?? 0;
@@ -424,9 +451,13 @@ export default function Calculator() {
                             rear: physicalWidthLong
                         },
                         length: physicalLength,
+                        lengthStraight: row.length?.straight ?? l,
+                        lengthSplayed: row.length?.splayed ?? physicalLength,
+                        lengthEdgeFront: row.length?.splayed ?? physicalLength,
+                        lengthEdgeRear: row.length?.straight ?? l,
                         height: safeHeight,
                         angle_deg: row.angle,
-                        modeName: 'Inward',
+                        modeName: splayType === 'single' ? 'Inward Single-sided' : 'Inward Double-sided',
                         outerRatio: `1:${parsedWRatio.toFixed(2)}:${parsedLRatio.toFixed(2)}`,
                         avgRatio: row.message
                     }
@@ -467,7 +498,7 @@ export default function Calculator() {
 
     const runControlled = () => {
         if (!isInputComplete) return;
-        const res = analysis.splayTheRoomWithTheSameRatio(parsedWRatio, parsedLRatio, controlledHeight, inputs.angle);
+        const res = analysis.splayTheRoomWithTheSameRatio(parsedWRatio, parsedLRatio, controlledHeight, inputs.angle, splayType);
         setActiveTab('controlled');
         setResult(res);
         setSelectedModalData(null);
@@ -516,6 +547,48 @@ export default function Calculator() {
             {/* INPUT & CHART PANEL */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6 items-start">
                 <div className="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200 md:col-span-2">
+                    {/* SPLAY TYPE SELECTOR */}
+                    <div className="flex flex-col pt-2">
+                        <label className="block text-xs mb-1 text-slate-600 font-medium">Splay Type</label>
+                        <div className="flex gap-3 items-center">
+                            <label className="inline-flex items-center text-xs cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="splayType"
+                                    value="double"
+                                    checked={splayType === 'double'}
+                                    onChange={() => {
+                                        setSplayType('double');
+                                        setResult(null);
+                                        setActiveTab(null);
+                                        setSelectedModalData(null);
+                                        setReal3DModes([]);
+                                        setLast3DAnalysis(null);
+                                    }}
+                                    className="accent-indigo-600 mr-1"
+                                />
+                                Double-sided
+                            </label>
+                            <label className="inline-flex items-center text-xs cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="splayType"
+                                    value="single"
+                                    checked={splayType === 'single'}
+                                    onChange={() => {
+                                        setSplayType('single');
+                                        setResult(null);
+                                        setActiveTab(null);
+                                        setSelectedModalData(null);
+                                        setReal3DModes([]);
+                                        setLast3DAnalysis(null);
+                                    }}
+                                    className="accent-indigo-600 mr-1"
+                                />
+                                Single-sided
+                            </label>
+                        </div>
+                    </div>
 
                     {/* INPUT: Width Ratio */}
                     <div>
@@ -553,9 +626,11 @@ export default function Calculator() {
                         <div className="flex justify-between items-center mb-1">
                             <label className="block text-xs text-slate-600">Height (h) - meters</label>
                             {isInputComplete && strategyMode === 'controlled' && (
-                                <span className="text-[10px] font-mono font-bold flex items-center gap-1 px-1.5 py-0.5 rounded shadow-3xs animate-fade-in text-indigo-600 bg-indigo-50/60">
-                                    <MdLock size={12} />
-                                    {`Min: ${controlledEffectiveMinH}m (${controlledEffectiveMinH === 2.5 ? 'Arch. Limit' : 'Wfront 4 m limit'})`}
+                                <span className="text-[10px] font-mono font-bold flex items-center gap-1 px-1.5 py-0.5 rounded shadow-3xs animate-fade-in text-amber-700 bg-amber-50/60">
+                                    <MdWarning size={12} />
+                                    {controlledWallWarning
+                                        ? `4 m wall limit: ${controlledWallLimitH}m — Warning`
+                                        : `4 m wall limit: ${controlledWallLimitH}m — OK`}
                                 </span>
                             )}
                         </div>
@@ -565,8 +640,8 @@ export default function Calculator() {
                                 type="button"
                                 disabled={
                                     !isInputComplete ||
-                                    (strategyMode === 'controlled' && controlledHeight <= controlledEffectiveMinH) ||
-                                    (strategyMode === 'optimum' && Number(inputs.height) <= 0.1)
+                                    (strategyMode === 'controlled' && Number(controlledHeight) <= controlledEffectiveMinH) ||
+                                    (strategyMode === 'optimum' && Number(inputs.height) <= optimumMinH)
                                 }
                                 onClick={() => stepInput('height', 'down', 0.01)}
                                 className={`px-3 py-1.5 font-bold transition-colors select-none cursor-pointer
@@ -603,15 +678,15 @@ export default function Calculator() {
                                     } else {
                                         setInputs(prev => {
                                             const num = Number(prev.height);
-                                            if (isNaN(num) || num < 0.1) {
-                                                return { ...prev, height: 0.1 };
+                                            if (isNaN(num) || num < optimumMinH) {
+                                                return { ...prev, height: optimumMinH };
                                             }
                                             return { ...prev, height: parseFloat(num.toFixed(2)) };
                                         });
                                     }
                                 }}
                                 className="w-full p-1.5 text-sm text-center border-none outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none font-semibold text-slate-900"
-                                placeholder={strategyMode === 'controlled' ? controlledEffectiveMinH.toString() : "2.5"}
+                                placeholder={strategyMode === 'controlled' ? controlledEffectiveMinH.toString() : optimumMinH.toString()}
                             />
 
                             <button
@@ -628,26 +703,29 @@ export default function Calculator() {
                             <div className="pt-1 px-1 animate-fade-in">
                                 <input
                                     type="range"
-                                    min={strategyMode === 'controlled' ? controlledEffectiveMinH : 2}
-                                    max={strategyMode === 'controlled' ? controlledEffectiveMinH + 3 : 6.0}
+                                    min={strategyMode === 'controlled' ? controlledEffectiveMinH : optimumMinH}
+                                    max={strategyMode === 'controlled' ? Math.max(controlledEffectiveMinH + 3, controlledWallLimitH + 3) : 6.0}
                                     step="0.01"
-                                    value={strategyMode === 'controlled' ? (controlledHeight || controlledEffectiveMinH) : (inputs.height || 2.5)}
+                                    value={strategyMode === 'controlled'
+                                        ? (controlledHeight || controlledEffectiveMinH)
+                                        : (inputs.height || optimumMinH)}
                                     onChange={(e) => {
                                         const val = parseFloat(Number(e.target.value).toFixed(2));
                                         if (strategyMode === 'controlled') {
                                             setControlledHeight(val);
                                         } else {
-                                            setInputs({ ...inputs, height: val });
+                                            setInputs({ ...inputs, height: Math.max(optimumMinH, val) });
                                         }
                                     }}
                                     className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-slate-200 focus:outline-none accent-indigo-600`}
                                 />
                                 <div className="flex justify-between text-[10px] text-slate-400 font-mono mt-0.5">
-                                    <span>Min: {strategyMode === 'controlled' ? controlledEffectiveMinH : 2}m</span>
-                                    <span>Max: {strategyMode === 'controlled' ? (controlledEffectiveMinH + 3).toFixed(2) : 6.0}m</span>
+                                    <span>Min: {strategyMode === 'controlled' ? controlledEffectiveMinH : optimumMinH}m</span>
+                                    <span>Max: {strategyMode === 'controlled' ? Math.max(controlledEffectiveMinH + 3, controlledWallLimitH + 3).toFixed(2) : 6.0}m</span>
                                 </div>
                             </div>
                         )}
+                        
                     </div>
 
                     <div className="pt-3 border-t border-slate-200/80 space-y-2">
@@ -680,15 +758,15 @@ export default function Calculator() {
                     </div>
 
                     <div className="pt-1">
-                        {strategyMode === 'optimum' ? (
-                            <button onClick={runOptimum} disabled={!isInputComplete} className="w-full p-2.5 bg-slate-900 hover:bg-slate-950 disabled:bg-slate-400 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold tracking-wider shadow-xs transition">
-                                CALCULATE OPTIMUM ANGLES
-                            </button>
-                        ) : (
-                            <button onClick={runControlled} disabled={!isInputComplete} className="w-full p-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold tracking-wider shadow-xs transition">
-                                EXECUTE CONTROLLED GEOMETRY
-                            </button>
-                        )}
+                    {strategyMode === 'optimum' ? (
+                        <button onClick={runOptimum} disabled={!isInputComplete} className="w-full p-2.5 bg-slate-900 hover:bg-slate-950 disabled:bg-slate-400 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold tracking-wider shadow-xs transition">
+                            CALCULATE OPTIMUM ANGLES
+                        </button>
+                    ) : (
+                        <button onClick={runControlled} disabled={!isInputComplete} className="w-full p-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold tracking-wider shadow-xs transition">
+                            EXECUTE CONTROLLED GEOMETRY
+                        </button>
+                    )}
                     </div>
                 </div>
 
@@ -726,7 +804,7 @@ export default function Calculator() {
                             <h2 className="text-xs font-bold uppercase tracking-wider">
                                 {strategyMode === 'controlled' ? 'Initial Rectangular Dimensions' : 'Initial Room Response'}
                             </h2>
-                            <p className="text-xs text-slate-200 font-mono">Dimensions: {w.toFixed(2)} m x {l.toFixed(2)} m x {currentHeight} m</p>
+                            <p className="text-xs text-slate-200 font-mono">Dimensions: {w.toFixed(2)} m x {l.toFixed(2)} m x {currentHeight.toFixed(2)} m</p>
                             <span className="text-slate-400 text-xs">
                                 1 : {(w / currentHeight).toFixed(2)} : {(l / currentHeight).toFixed(2)}
                             </span>
@@ -740,9 +818,12 @@ export default function Calculator() {
                             )}
 
                             {strategyMode === 'controlled' ? (
-                                initialRoomData.areaWarning ? (
-                                    <span className="text-rose-400 flex items-center gap-1 font-mono">
-                                        <MdWarning size={15} /> Warning (Area {initialRoomData.areaWarning})
+                                initialRoomData.areaWarning || controlledWallWarning ? (
+                                    <span className="text-amber-400 flex items-center gap-1 font-mono text-xs">
+                                        <MdWarning size={15} />
+                                        Warning
+                                        {initialRoomData.areaWarning && ` (Area ${initialRoomData.areaWarning})`}
+                                        {controlledWallWarning && ` (4 m wall limit: ${controlledWallLimitH.toFixed(2)} m)`}
                                     </span>
                                 ) : (
                                     <span className="text-cyan-100 font-mono flex items-center gap-1 text-sm">
@@ -850,7 +931,9 @@ export default function Calculator() {
             {result && isInputComplete && (
                 <div ref={resultRef} className="p-5 bg-white border border-slate-200 rounded-xl shadow-sm space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <h2 className="text-lg font-bold flex items-center gap-2 border-b pb-2">
-                        <span className="w-1.5 h-5 bg-blue-500 rounded-full"></span> {strategyMode === 'controlled' ? "Equivalent Trapezoidal Dimensions" : "Splaying Results"}
+                        <span className="w-1.5 h-5 bg-blue-500 rounded-full"></span> {strategyMode === 'controlled'
+                            ? `Equivalent Trapezoidal Dimensions (${splayType === 'single' ? 'Single-sided' : 'Double-sided'})`
+                            : "Splaying Results"}
                     </h2>
 
                     {activeTab === 'optimum' && (
@@ -865,7 +948,7 @@ export default function Calculator() {
                                                 <th className="p-2 text-center text-xs">Axial Clusters</th>
                                                 <th className="p-2 text-center text-xs">FSI</th>
                                                 <th className="p-2 text-center text-xs">First Cluster</th>
-                                                <th className="p-2 text-center text-xs">ITU</th>
+                                                <th className="p-2 text-center text-xs">Compliance</th>
                                                 <th className="p-2 text-center text-xs">3D Solver</th>
                                             </tr>
                                         </thead>
@@ -1032,7 +1115,7 @@ export default function Calculator() {
 
                     {activeTab === 'controlled' && (
                         <div className="space-y-4">
-                            <div className="grid grid-cols-3 lg:grid-cols-5 gap-3 font-mono text-sm animate-in zoom-in-95 duration-200">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 font-mono text-sm animate-in zoom-in-95 duration-200">
                                 <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
                                     <p className="text-xs md:text-[10px] text-indigo-500 uppercase font-sans tracking-wide">Width Rear</p>
                                     <p className="text-base md:text-sm font-semibold">{result.width.rear.toFixed(2)} m</p>
@@ -1042,15 +1125,19 @@ export default function Calculator() {
                                     <p className="text-base md:text-sm font-semibold">{result.width.front.toFixed(2)} m</p>
                                 </div>
                                 <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
-                                    <p className="text-xs md:text-[10px] text-indigo-500 uppercase font-sans tracking-wide">Length</p>
-                                    <p className="text-base md:text-sm font-semibold">{splayedL.toFixed(2)} m</p>
+                                    <p className="text-xs md:text-[10px] text-indigo-500 uppercase font-sans tracking-wide">Length Edge 1</p>
+                                    <p className="text-base md:text-sm font-semibold">{(result.lengthEdges?.splayed ?? splayedL).toFixed(2)} m</p>
                                 </div>
+                                <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
+                                    <p className="text-xs md:text-[10px] text-indigo-500 uppercase font-sans tracking-wide">Length Edge 2</p>
+                                    <p className="text-base md:text-sm font-semibold">{(result.lengthEdges?.straight ?? splayedL).toFixed(2)} m</p>
+                                </div>
+                                
                                 <div className="p-3 md:p-2.5 bg-slate-50 border border-slate-100 rounded">
                                     <p className="text-xs md:text-[10px] text-indigo-500 uppercase font-sans tracking-wide">Angle</p>
                                     <p className="text-base md:text-sm font-semibold">{result.angle_deg}°</p>
                                 </div>
                             </div>
-                            <ControlledRoomVisualizer result={result} />
                         </div>
                     )}
 
@@ -1115,7 +1202,7 @@ export default function Calculator() {
 
                             {!is3DLoading && last3DAnalysis && (
                                 <div className="text-[10px] font-mono text-slate-400 text-right mt-2">
-                                    Wf {last3DAnalysis.widthFront.toFixed(2)} m | Wr {last3DAnalysis.widthRear.toFixed(2)} m | L {last3DAnalysis.length.toFixed(2)} m | H {last3DAnalysis.height.toFixed(2)} m | {last3DAnalysis.angle}° ({last3DAnalysis.modeName})
+                                    Wf {last3DAnalysis.widthFront.toFixed(2)} m | Wr {last3DAnalysis.widthRear.toFixed(2)} m | Lf {last3DAnalysis.lengthEdgeFront.toFixed(2)} m | Lr {last3DAnalysis.lengthEdgeRear.toFixed(2)} m | H {last3DAnalysis.height.toFixed(2)} m | {last3DAnalysis.angle}° ({last3DAnalysis.modeName}) [{last3DAnalysis.splayType === 'single' ? 'Single-sided' : 'Double-sided'}]
                                 </div>
                             )}
 
@@ -1157,7 +1244,7 @@ export default function Calculator() {
                                 <div className="flex items-center gap-2 ml-auto sm:ml-0">
                                     <button
                                         onClick={handleClearAllSaved}
-                                        className="px-3 py-2 bg-rose-10 hover:bg-rose-100 text-mist-950 border border-rose-300 rounded-lg text-xs font-bold tracking-wide transition-colors flex items-center gap-1.5 cursor-pointer"
+                                        className="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg text-xs font-bold tracking-wide transition-colors flex items-center gap-1.5 cursor-pointer"
                                         title="Clear all saved comparison reports"
                                     >
                                         <MdDelete size={16} />
@@ -1183,7 +1270,7 @@ export default function Calculator() {
                                             <th className="p-3 w-28">Angle (Mode)</th>
                                             <th className="p-3 w-36">Outer Rectangular Ratio</th>
                                             <th className="p-3 w-36">Average Splayed Ratio</th>
-                                            <th className="p-3 w-40">Dim (Wf/Wr x L)</th>
+                                            <th className="p-3 w-52">Dimensions (Wf/Wr | Lf/Lr)</th>
                                             <th className="p-3 w-20">Height</th>
                                             <th className="p-3 w-24">3D FEM FSI</th>
                                             <th className="p-3 w-44">3D FEM Frequencies</th>
