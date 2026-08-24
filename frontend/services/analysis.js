@@ -167,9 +167,9 @@ export function calculateDesignPhaseMetrics(wRatio, lRatio, angle_deg, splayType
         // The straight longitudinal edge is the original rectangular-room
         // length. The splayed edge is the geometric extension of that same
         // length because it is inclined by the splay angle.
-        sPrimeL_straight = lRatio;
+        sPrimeL_straight = lRatio * (2 * Math.cos(angle_rad)) / (1 + Math.cos(angle_rad));
         sPrimeL_splayed = sPrimeL_straight / Math.cos(angle_rad);
-        sPrimeL = (sPrimeL_straight + sPrimeL_splayed) / 2;
+        sPrimeL = (sPrimeL_straight + sPrimeL_splayed) / 2; // artık tam olarak lRatio'ya eşit
 
         // The outer/fixed width is sPrimeW. The splayed side moves inward by
         // the horizontal projection of the original straight length.
@@ -182,7 +182,9 @@ export function calculateDesignPhaseMetrics(wRatio, lRatio, angle_deg, splayType
         sPrimeL_straight = sPrimeL;
     }
 
-    const denominator = sPrimeW - (2 * sPrimeL * Math.tan(angle_rad));
+    const denominator = splayType === 'single'
+    ? sPrimeW - (sPrimeL_straight * Math.tan(angle_rad))
+    : sPrimeW - (2 * sPrimeL * Math.tan(angle_rad));
     const hMinFormula = denominator > 0 ? (4 / denominator) : 2.5;
     const hMin = parseFloat(Math.max(2.5, hMinFormula).toFixed(2));
 
@@ -220,12 +222,13 @@ export function splayTheRoomWithTheSameRatio(wRatio, lRatio, h, angle_deg, splay
         width_rear = metrics.sPrimeW * h;
         width_front = (metrics.sPrimeW - (metrics.sPrimeL_straight * Math.tan(angle_rad))) * h;
     } else {
-        length = metrics.sPrimeL * h;
-        length_splayed = length;
-        length_straight = length;
+        const axialLength = metrics.sPrimeL * h;               // splay öncesi eksenel uzunluk (Initial için doğru)
+    length_splayed = axialLength / Math.cos(angle_rad);    // gerçek, eğilmiş duvar paneli (BÜYÜK olmalı)
+    length_straight = length_splayed;                       // double'da iki duvar da simetrik, straight kenar yok
+    length = length_splayed;                                 // gösterilecek temsili uzunluk
 
-        width_front = (metrics.sPrimeW - (2 * metrics.sPrimeL * Math.tan(angle_rad))) * h;
-        width_rear = metrics.sPrimeW * h;
+    width_front = (metrics.sPrimeW - (2 * metrics.sPrimeL * Math.tan(angle_rad))) * h;
+    width_rear = metrics.sPrimeW * h;
     }
 
     return {

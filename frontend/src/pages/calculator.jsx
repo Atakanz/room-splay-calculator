@@ -77,7 +77,7 @@ export default function Calculator() {
 
     if (strategyMode === 'controlled' && isInputComplete && designMetrics) {
         w = designMetrics.sPrimeW * currentHeight;
-        l = designMetrics.sPrimeL * currentHeight;
+        l = designMetrics.sPrimeL_straight * currentHeight;
     }
     const currentArea = w * l;
     const splayedL = currentHeight * safeSL;
