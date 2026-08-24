@@ -882,7 +882,7 @@ const handleCalculate3D = () => {
                                                 {m.freq} Hz
                                             </span>
                                             <span className="text-[10px] font-sans text-slate-400 bg-slate-800/80 px-1.5 py-0.5 rounded border border-slate-700/50">
-                                                ({m.type})
+                                                {m.type}
                                             </span>
                                         </div>
                                         <span className="text-slate-400 text-[11px] w-20 text-right font-mono shrink-0">
