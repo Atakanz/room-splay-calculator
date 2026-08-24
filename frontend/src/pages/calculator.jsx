@@ -629,8 +629,8 @@ const handleCalculate3D = () => {
                                 <span className="text-[10px] font-mono font-bold flex items-center gap-1 px-1.5 py-0.5 rounded shadow-3xs animate-fade-in text-amber-700 bg-amber-50/60">
                                     <MdWarning size={12} />
                                     {controlledWallWarning
-                                        ? `4 m wall limit: ${controlledWallLimitH}m — Warning`
-                                        : `4 m wall limit: ${controlledWallLimitH}m — OK`}
+                                        ? `4 m wall limit: ${controlledWallLimitH} m — Warning`
+                                        : `4 m wall limit: ${controlledWallLimitH} m`}
                                 </span>
                             )}
                         </div>
