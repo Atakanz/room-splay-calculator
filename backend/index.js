@@ -21,7 +21,7 @@ const processNext = () => {
     isProcessing = true;
     const { req, res } = queue.shift();
     console.log("Yeni istek geldi:", req.body);
-    const { lengthMean, currentHeight, wMin, wMax } = req.body || {};
+    const { lengthMean, currentHeight, wMin, wMax, splayType = 'double' } = req.body || {};
 
     const venvPython = '/venv/bin/python3';
     const pythonExecutable = fs.existsSync(venvPython) ? venvPython : 'python3';
@@ -31,7 +31,8 @@ const processNext = () => {
         String(lengthMean || 0),
         String(currentHeight || 0),
         String(wMin || 0),
-        String(wMax || 0)
+        String(wMax || 0),
+        splayType === 'single' ? 'single' : 'double'
     ]);
 
     let pythonData = "";
@@ -40,6 +41,8 @@ const processNext = () => {
 
     // Bağlantı koptuğunda tetiklenecek güvenli iptal fonksiyonu
     const handleAbort = () => {
+        console.log("handleAbort called");
+
         if (aborted || res.writableEnded) return;
         aborted = true;
 
@@ -62,9 +65,17 @@ const processNext = () => {
         pythonProcess.once('close', () => clearTimeout(killTimeout));
     };
 
-    // Hem request hem response kapanışlarını dinle
-    req.on('aborted', handleAbort);
-    res.on('close', handleAbort);
+    req.on('aborted', () => {
+        console.log("req aborted");
+        handleAbort();
+    });
+
+    res.on('close', () => {
+        console.log("res close");
+        if (!res.writableEnded) {
+            handleAbort();
+        }
+    });
 
     pythonProcess.stdout.on('data', (data) => {
         pythonData += data.toString();

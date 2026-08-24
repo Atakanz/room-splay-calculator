@@ -29,7 +29,7 @@ def stiffness_form(u, v, w):
 def mass_form(u, v, w):
     return u * v
 
-def generate_optimized_mesh(length, height, w_min, w_max):
+def generate_optimized_mesh(length, height, w_min, w_max, splay_type='double'):
     h_x = 0.3
     h_y = 0.3
     h_z = 0.3
@@ -53,7 +53,14 @@ def generate_optimized_mesh(length, height, w_min, w_max):
     z = p[2] * height
 
     w_x = w_min + (w_max - w_min) * p[0]
-    offset = (w_max - w_x) / 2.0
+
+    if splay_type == 'single':
+        # Single-sided splay: one longitudinal wall remains fixed.
+        offset = 0.0
+    else:
+        # Double-sided splay: both longitudinal walls move symmetrically.
+        offset = (w_max - w_x) / 2.0
+
     y = offset + p[1] * w_x
 
     transformed_points = np.vstack([x, y, z])
@@ -71,9 +78,15 @@ def _solve_with_superlu(K, M, k_modes, sigma):
     )
     return eigenvalues
 
-def calculate_3d_modes(lengthMean, currentHeight, wMin, wMax):
+def calculate_3d_modes(femLength, currentHeight, wMin, wMax, splay_type='double'):
     try:
-        mesh = generate_optimized_mesh(lengthMean, currentHeight, wMin, wMax)
+        mesh = generate_optimized_mesh(
+            femLength,
+            currentHeight,
+            wMin,
+            wMax,
+            splay_type
+        )
 
         element = ElementTetP2()
         basis = InteriorBasis(mesh, element)
@@ -143,15 +156,24 @@ def calculate_3d_modes(lengthMean, currentHeight, wMin, wMax):
 
 if __name__ == "__main__":
     try:
-        if len(sys.argv) < 5:
+        if len(sys.argv) < 6:
             raise ValueError("Eksik parametre gönderildi.")
 
-        lengthMean = float(sys.argv[1])
+        femLength = float(sys.argv[1])
         currentHeight = float(sys.argv[2])
         wMin = float(sys.argv[3])
         wMax = float(sys.argv[4])
+        splay_type = sys.argv[5]
+        if splay_type not in ('single', 'double'):
+            raise ValueError(f"Geçersiz splay_type: {splay_type}")
 
-        freq_list = calculate_3d_modes(lengthMean, currentHeight, wMin, wMax)
+        freq_list = calculate_3d_modes(
+            femLength,
+            currentHeight,
+            wMin,
+            wMax,
+            splay_type
+        )
 
         print(json.dumps({"frequencies": freq_list}))
         sys.stdout.flush()
