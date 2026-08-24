@@ -802,7 +802,7 @@ const handleCalculate3D = () => {
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-700 pb-2 mb-3 gap-3">
                         <div>
                             <h2 className="text-xs font-bold uppercase tracking-wider">
-                                {strategyMode === 'controlled' ? 'Initial Rectangular Dimensions' : 'Initial Room Response'}
+                                {strategyMode === 'controlled' ? 'Pre-Splay Reference Rectangle' : 'Initial Room Response'}
                             </h2>
                             <p className="text-xs text-slate-200 font-mono">Dimensions: {w.toFixed(2)} m x {l.toFixed(2)} m x {currentHeight.toFixed(2)} m</p>
                             <span className="text-slate-400 text-xs">
