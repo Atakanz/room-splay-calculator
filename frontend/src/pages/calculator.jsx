@@ -308,6 +308,31 @@ const handleCalculate3D = () => {
             return;
         }
 
+        // Enforce ratio limits for direct keyboard input as well as the +/- buttons.
+        if (name === 'wRatio' || name === 'lRatio') {
+            const numericVal = Number(val);
+            if (!Number.isFinite(numericVal)) return;
+
+            const clampedVal = Math.min(3, Math.max(1, numericVal));
+            const nextInputs = {
+                ...inputs,
+                [name]: clampedVal
+            };
+
+            setInputs(nextInputs);
+
+            if (strategyMode === 'controlled') {
+                setControlledHeight(prev => parseFloat(Math.max(Number(prev) || 2.5, 2.5).toFixed(2)));
+            }
+
+            setResult(null);
+            setActiveTab(null);
+            setSelectedModalData(null);
+            setReal3DModes([]);
+            setLast3DAnalysis(null);
+            return;
+        }
+
         if (name !== 'height') {
             const nextInputs = { ...inputs, [name]: val };
             const currentW = Number(nextInputs.wRatio);
@@ -595,7 +620,7 @@ const handleCalculate3D = () => {
                         <label className="block text-xs mb-1 text-slate-600">{strategyMode === 'controlled' ? 'Target Width Ratio (Sw)' : 'Width Ratio (Sw)'} </label>
                         <div className="flex items-center rounded border border-slate-200 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
                             <button type="button" onClick={() => stepInput('wRatio', 'down', 0.01)} className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold transition-colors">-</button>
-                            <input name="wRatio" type="number" step="0.01" value={inputs.wRatio} onChange={handleInputChange} className="w-full p-1.5 text-sm text-center border-none outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                            <input name="wRatio" max={3} min={1} type="number" step="0.01" value={inputs.wRatio} onChange={handleInputChange} className="w-full p-1.5 text-sm text-center border-none outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                             <button type="button" onClick={() => stepInput('wRatio', 'up', 0.01)} className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold transition-colors">+</button>
                         </div>
                     </div>
@@ -605,7 +630,7 @@ const handleCalculate3D = () => {
                         <label className="block text-xs mb-1 text-slate-600">{strategyMode === 'controlled' ? 'Target Length Ratio (SL)' : 'Length Ratio (SL)'}</label>
                         <div className="flex items-center rounded border border-slate-200 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
                             <button type="button" onClick={() => stepInput('lRatio', 'down', 0.01)} className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold transition-colors">-</button>
-                            <input name="lRatio" type="number" step="0.01" value={inputs.lRatio} onChange={handleInputChange} className="w-full p-1.5 text-sm text-center border-none outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                            <input name="lRatio" max={3} min={1} type="number" step="0.01" value={inputs.lRatio} onChange={handleInputChange} className="w-full p-1.5 text-sm text-center border-none outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                             <button type="button" onClick={() => stepInput('lRatio', 'up', 0.01)} className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold transition-colors">+</button>
                         </div>
                     </div>
