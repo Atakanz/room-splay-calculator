@@ -1227,7 +1227,7 @@ const handleCalculate3D = () => {
 
                             {!is3DLoading && last3DAnalysis && (
                                 <div className="text-[10px] font-mono text-slate-400 text-right mt-2">
-                                    Wf {last3DAnalysis.widthFront.toFixed(2)} m | Wr {last3DAnalysis.widthRear.toFixed(2)} m | Lf {last3DAnalysis.lengthEdgeFront.toFixed(2)} m | Lr {last3DAnalysis.lengthEdgeRear.toFixed(2)} m | H {last3DAnalysis.height.toFixed(2)} m | {last3DAnalysis.angle}° ({last3DAnalysis.modeName}) [{last3DAnalysis.splayType === 'single' ? 'Single-sided' : 'Double-sided'}]
+                                    Wf {last3DAnalysis.widthFront.toFixed(2)} m | Wr {last3DAnalysis.widthRear.toFixed(2)} m | Lf {last3DAnalysis.lengthEdgeFront.toFixed(2)} m | Lr {last3DAnalysis.lengthEdgeRear.toFixed(2)} m | H {last3DAnalysis.height.toFixed(2)} m | {last3DAnalysis.angle}° ({last3DAnalysis.modeName})
                                 </div>
                             )}
 
